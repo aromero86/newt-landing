@@ -231,7 +231,7 @@ function Iterate() {
         </span>
         <span className="rounded-md bg-ok/10 px-2 py-0.5 font-mono text-ok">+ “up to €500”</span>
       </div>
-      <ul className="flex flex-col gap-2">
+      <ul className="flex flex-col gap-1.5">
         <DeltaRow
           delta={changed}
           viewed={at >= 2}
@@ -254,7 +254,7 @@ function Iterate() {
         ))}
         <DeltaRow delta={deltas[3]!} viewed={at >= 3} state={at >= 3 ? 'approved' : 'pending'} highlight={at >= 3 ? undefined : 'warn'} />
       </ul>
-      <Show when={at >= 4} className="absolute right-4 bottom-4 left-4">
+      <Show when={at >= 4} className="mt-2">
         <div className="flex items-center gap-2 rounded-lg border border-ok/40 bg-ok/8 px-3 py-2 text-xs text-ok">
           <CheckCircle2Icon className="size-4" /> 5 of 5 deltas approved · gate passed · 0 conflicts
         </div>
@@ -281,7 +281,7 @@ function Accepted() {
       </div>
       <div className="grid grid-cols-3 gap-3 text-xs">
         {['Product', 'To do', 'In progress'].map(col => (
-          <div key={col} className="min-h-[250px] rounded-lg bg-subtle p-2">
+          <div key={col} className="min-h-[200px] rounded-lg bg-subtle p-2">
             <div className="mb-2 px-1 font-medium text-muted-foreground">{col}</div>
             <div className="flex flex-col gap-2">
               {col === 'Product' && at < 1 && <BoardCard layoutId="p42" />}
@@ -293,7 +293,7 @@ function Accepted() {
           </div>
         ))}
       </div>
-      <Show when={at >= 2} className="absolute right-4 bottom-4 left-4">
+      <Show when={at >= 2} className="mt-3">
         <div className="rounded-lg border bg-card px-3 py-2 text-xs">
           <span className="text-muted-foreground">Planned definition:</span> 1 rule changed, 1 rule added, Order lifecycle +1 state, 1 new parameter
         </div>
@@ -357,10 +357,8 @@ function PullRequest() {
         ))}
       </div>
       <Show when={at >= 2} className="mt-3 rounded-md border p-3">
-        <div className="mb-2 text-xs font-medium">newt / product definition — 1 failing, 1 warning</div>
+        <div className="mb-2 text-xs font-medium">newt / product definition — 2 pass, 1 failing, 1 warning</div>
         <div className="space-y-1">
-          <CheckLine result="pass"><b>R-12</b> guests pay only with Bizum</CheckLine>
-          <CheckLine result="pass"><b>R-31</b> guest invoice by email · tested</CheckLine>
           <CheckLine result="fail"><b>R-07</b> €500 limit · payment.ts:42</CheckLine>
           <CheckLine result="warn"><b>Order</b> “awaiting Bizum” has no test</CheckLine>
         </div>

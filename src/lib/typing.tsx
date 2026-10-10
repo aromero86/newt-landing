@@ -52,6 +52,9 @@ export function Caret({ className }: { className?: string }) {
  * positioned parent; `click` plays a ripple. Purely decorative.
  */
 export function FakeCursor({ x, y, click = false, visible = true }: { x: number; y: number; click?: boolean; visible?: boolean }) {
+  // Decorative and only meaningful in motion: not shown with reduced motion.
+  const reduced = useReducedMotion()
+  if (reduced) return null
   return (
     <motion.div
       aria-hidden

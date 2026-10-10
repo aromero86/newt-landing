@@ -118,7 +118,7 @@ export function GitHubWindow({
         </div>
         <div className="mt-2 flex items-center gap-2 text-xs">
           <span className={cn('rounded-full px-2.5 py-0.5 font-medium capitalize', badge)}>{state === 'blocked' ? 'Open' : state}</span>
-          <span className="text-muted-foreground">wants to merge into main</span>
+          <span className="text-muted-foreground">{state === 'merged' ? 'merged into main' : 'wants to merge into main'}</span>
         </div>
         <div className="mt-3 flex gap-1 overflow-x-auto text-xs">
           {tabs.map(t => (

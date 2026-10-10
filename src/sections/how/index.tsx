@@ -26,15 +26,15 @@ export default function How() {
         the definition of the product is never out of date.
       </SectionHeading>
       <div className="grid gap-10 lg:grid-cols-[0.78fr_1.22fr] lg:gap-14">
-        <ol className="flex flex-col">
+        <ol className="flex min-w-0 flex-col">
           {steps.map((s, i) => (
             <StepBlock key={s.title} index={i} active={active === i} onActive={() => setActive(i)} />
           ))}
         </ol>
         <div className="hidden lg:block">
-          <div className="sticky top-24 flex h-[calc(100vh-8rem)] max-h-[680px] min-h-[560px] flex-col justify-center">
+          <div className="sticky top-24 flex h-[calc(100vh-8rem)] max-h-[720px] min-h-[600px] flex-col justify-center">
             <Progress active={active} />
-            <div className="relative mt-4 h-[500px]">
+            <div className="relative mt-4 h-[540px]">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}
@@ -76,7 +76,7 @@ function StepBlock({ index, active, onActive }: { index: number; active: boolean
         <p className="mt-3 text-pretty text-muted-foreground">{s.text}</p>
       </div>
       {/* On small screens every step shows its own stage, inline. */}
-      <div className="mt-6 h-[460px] lg:hidden">
+      <div className="mt-6 h-[520px] lg:hidden">
         <InlineStage step={index} />
       </div>
     </li>

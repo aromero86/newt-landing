@@ -3,13 +3,20 @@ import { useInView, useReducedMotion } from 'motion/react'
 
 /**
  * Drives a scripted animation: advances through `count` steps while the element
- * is on screen, looping. With reduced motion it shows the final step, still.
+ * is on screen, looping. With reduced motion it shows the final step and only
+ * moves when the visitor picks a step.
  */
 export function useStepper(count: number, { interval = 2400, loop = true, hold = 2 } = {}) {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { amount: 0.35 })
   const reduced = useReducedMotion()
-  const [step, setStep] = useState(0)
+  // With reduced motion: start on the final step and never advance on its own,
+  // but still let the visitor step through by hand (setStep).
+  const [step, setStep] = useState(() => (reduced ? count - 1 : 0))
+
+  useEffect(() => {
+    if (reduced) setStep(count - 1)
+  }, [reduced, count])
 
   useEffect(() => {
     if (reduced || !inView) return
@@ -21,7 +28,7 @@ export function useStepper(count: number, { interval = 2400, loop = true, hold =
     return () => clearTimeout(id)
   }, [step, inView, reduced, count, interval, loop, hold])
 
-  return { ref, step: reduced ? count - 1 : step, setStep, reduced: !!reduced }
+  return { ref, step, setStep, reduced: !!reduced }
 }
 
 export const ease = [0.22, 1, 0.36, 1] as const

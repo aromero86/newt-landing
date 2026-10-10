@@ -107,6 +107,12 @@
   html:not(.dark) {
     color-scheme: light;
   }
+  /* Ligatures turn != and === into glyphs that read badly in a diff. */
+  code,
+  pre,
+  .font-mono {
+    font-variant-ligatures: none;
+  }
   body {
     @apply bg-background text-foreground font-sans antialiased;
     font-feature-settings: "cv11", "ss01";
