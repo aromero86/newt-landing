@@ -4,12 +4,12 @@
  * whether animations play.
  *
  *   bun scripts/shoot.ts <url> <outDir> <shots.json>
- *   shots.json: [{ "name": "hero", "selector": "#hero", "times": [300, 2500], "width": 1440, "height": 900, "offset": 0, "dark": true }]
+ *   shots.json: [{ "name": "hero", "selector": "#hero", "times": [300, 2500], "width": 1440, "height": 900, "offset": 0, "lang": "es" }]
  */
 import { mkdir } from 'node:fs/promises'
 import { join } from 'node:path'
 
-type Shot = { name: string; reduced?: boolean; scrollThrough?: boolean; selector?: string; y?: number; offset?: number; times: number[]; width: number; height: number; light?: boolean; fullPage?: boolean }
+type Shot = { name: string; lang?: 'en' | 'es'; reduced?: boolean; scrollThrough?: boolean; selector?: string; y?: number; offset?: number; times: number[]; width: number; height: number; light?: boolean; fullPage?: boolean }
 
 const [url, outDir, shotsFile] = Bun.argv.slice(2)
 if (!url || !outDir || !shotsFile) throw new Error('usage: shoot.ts <url> <outDir> <shots.json>')
@@ -48,6 +48,12 @@ for (const shot of shots) {
   await send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-reduced-motion', value: shot.reduced ? 'reduce' : 'no-preference' }] })
   await send('Page.navigate', { url })
   await Bun.sleep(1200)
+  if (shot.lang) {
+    // The visitor's choice wins over the browser's language: store it and reload.
+    await evaluate(`localStorage.setItem('newt-lang', ${JSON.stringify(shot.lang)})`)
+    await send('Page.navigate', { url })
+    await Bun.sleep(1200)
+  }
   await evaluate(`document.documentElement.style.scrollBehavior='auto'; ${shot.light ? "document.documentElement.classList.remove('dark')" : ''}`)
   if (shot.scrollThrough) {
     // Reveal everything that animates in on scroll before a full-page capture.

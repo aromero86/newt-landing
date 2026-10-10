@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { FileTextIcon } from 'lucide-react'
 import { ease, useStepper } from '@/lib/motion'
-import { deltas, proposal } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT, type Bi } from '@/lib/i18n'
 import type { DeltaState } from '@/lib/data'
 import { ArtifactTag, DeltaBadge, ProposalBadge } from '@/components/mock/status'
 import { cn } from '@/lib/utils'
@@ -9,16 +10,26 @@ import { InfoCard, StepDots } from './card'
 
 /** Revision 2 rewrites the payment paragraph: only Δ1 changes. */
 const changedInR2 = 'Δ1'
-const r2Text = 'Guests can pay only with Bizum, in the mobile app, up to €500.'
 
-const steps = [
-  'Revision 1: newt extracts five deltas from the document. All pending.',
-  'Reviewers approve them one by one.',
-  'Revision 2 edits one paragraph. Only Δ1 changed: it goes back to pending, showing what changed.',
-  'Δ1 is approved again. The other four never had to be looked at twice.',
+const steps: Bi[] = [
+  {
+    en: 'Revision 1: newt extracts five deltas from the document. All pending.',
+    es: 'Revision 1: newt extrae cinco deltas del documento. Todos pending.',
+  },
+  { en: 'Reviewers approve them one by one.', es: 'Quienes revisan los aprueban uno a uno.' },
+  {
+    en: 'Revision 2 edits one paragraph. Only Δ1 changed: it goes back to pending, showing what changed.',
+    es: 'La revision 2 cambia un párrafo. Solo cambió Δ1: vuelve a pending y enseña qué cambió.',
+  },
+  {
+    en: 'Δ1 is approved again. The other four never had to be looked at twice.',
+    es: 'Δ1 se vuelve a aprobar. Los otros cuatro no hubo que mirarlos dos veces.',
+  },
 ]
 
 export function ViewedDeltas({ className }: { className?: string }) {
+  const t = useT()
+  const { deltas, proposal, rules } = useStory()
   const { ref, step, setStep } = useStepper(steps.length, { interval: 2600 })
 
   const stateOf = (id: string): DeltaState => {
@@ -31,9 +42,12 @@ export function ViewedDeltas({ className }: { className?: string }) {
     <InfoCard
       stepperRef={ref}
       index={3}
-      title="Deltas work like viewed files"
-      lead="Iterating a proposal doesn't reset the review: approved deltas that don't change stay approved."
-      caption={steps[step]}
+      title={t({ en: 'Deltas work like viewed files', es: 'Los deltas funcionan como ficheros vistos' })}
+      lead={t({
+        en: "Iterating a proposal doesn't reset the review: approved deltas that don't change stay approved.",
+        es: 'Iterar una proposal no reinicia la revisión: los deltas aprobados que no cambian siguen aprobados.',
+      })}
+      caption={t(steps[step]!)}
       captionKey={step}
       className={className}
     >
@@ -97,9 +111,9 @@ export function ViewedDeltas({ className }: { className?: string }) {
                     <p className="mt-1.5 text-[11px] leading-snug">
                       <span className="text-bad line-through decoration-bad/60">{d.after}</span>
                       <br />
-                      <span className="text-ok">{r2Text}</span>
+                      <span className="text-ok">{rules.guestsPayBizum.text}</span>
                     </p>
-                    <p className="mt-0.5 font-mono text-[10px] text-warn">changed since your approval</p>
+                    <p className="mt-0.5 font-mono text-[10px] text-warn">{t({ en: 'changed since your approval', es: 'cambió desde tu aprobación' })}</p>
                   </motion.div>
                 )}
               </AnimatePresence>

@@ -1,7 +1,8 @@
 import { useState, type ReactNode } from 'react'
-import { AnimatePresence, motion } from 'motion/react'
+import { motion } from 'motion/react'
 import { useStepper } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useT } from '@/lib/i18n'
 
 /** How long each step of a role's scenario stays on screen. */
 export const STEP_MS = 3000
@@ -14,6 +15,7 @@ const durationOf = (step: number, count: number) => (step === count - 1 ? STEP_M
  * On phones the step list folds into a compact bar above the scene.
  */
 export function Stage({ steps, children }: { steps: string[]; children: (step: number) => ReactNode }) {
+  const t = useT()
   const stepper = useStepper(steps.length, { interval: STEP_MS, hold: 2 })
   const { ref, reduced } = stepper
   // With reduced motion the shared stepper always shows the last step; a step
@@ -27,7 +29,7 @@ export function Stage({ steps, children }: { steps: string[]; children: (step: n
 
   return (
     <div ref={ref} className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)] lg:gap-8">
-      <ol className="hidden flex-col gap-1 lg:flex" aria-label="Scenario steps">
+      <ol className="hidden flex-col gap-1 lg:flex" aria-label={t({ en: 'Scenario steps', es: 'Pasos del escenario' })}>
         {steps.map((text, i) => {
           const current = i === step
           return (
@@ -69,6 +71,7 @@ export function Stage({ steps, children }: { steps: string[]; children: (step: n
 
 /** Phones: the current step in words, its progress, and dots to jump between steps. */
 function CompactSteps({ steps, step, setStep, reduced }: { steps: string[]; step: number; setStep: (n: number) => void; reduced: boolean }) {
+  const t = useT()
   return (
     <div className="relative overflow-hidden rounded-lg bg-card px-3.5 py-3 ring-1 ring-border lg:hidden">
       <p className="text-sm leading-snug" aria-live="polite">
@@ -83,7 +86,7 @@ function CompactSteps({ steps, step, setStep, reduced }: { steps: string[]; step
             key={text}
             type="button"
             onClick={() => setStep(i)}
-            aria-label={`Step ${i + 1}: ${text}`}
+            aria-label={`${t({ en: 'Step', es: 'Paso' })} ${i + 1}: ${text}`}
             aria-current={i === step ? 'step' : undefined}
             className={cn('h-1.5 flex-1 rounded-full transition-colors', i <= step ? 'bg-brand/70' : 'bg-muted')}
           />
@@ -108,20 +111,21 @@ function Progress({ step, count }: { step: number; count: number }) {
   )
 }
 
-/** Swaps between the screens of a scene (chat → app → GitHub…) with a soft cross-fade. */
+/**
+ * Swaps between the screens of a scene (chat → app → GitHub…). The new screen
+ * fades in; the old one leaves at once. An exit animation (AnimatePresence with
+ * mode="wait") got stuck here and left the scene empty or showing the old screen.
+ */
 export function Screen({ id, children, className }: { id: string; children: ReactNode; className?: string }) {
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={id}
-        initial={{ opacity: 0, y: 12, scale: 0.985 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: -8, scale: 0.985 }}
-        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        className={cn('min-w-0', className)}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <motion.div
+      key={id}
+      initial={{ opacity: 0, y: 12, scale: 0.985 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className={cn('min-w-0', className)}
+    >
+      {children}
+    </motion.div>
   )
 }

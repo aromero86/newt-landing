@@ -2,6 +2,7 @@ import type { ReactNode, Ref } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { ease } from '@/lib/motion'
 import { cn } from '@/lib/utils'
+import { useT } from '@/lib/i18n'
 
 /**
  * One infographic of the bento grid: a title, the animated visual, and a caption
@@ -69,13 +70,14 @@ export function InfoCard({
 
 /** Progress dots under a visual: which step of the story we are on. */
 export function StepDots({ count, step, onPick }: { count: number; step: number; onPick: (n: number) => void }) {
+  const t = useT()
   return (
     <div className="mt-3 flex justify-center gap-1.5">
       {Array.from({ length: count }, (_, i) => (
         <button
           key={i}
           type="button"
-          aria-label={`Show step ${i + 1} of ${count}`}
+          aria-label={t({ en: `Show step ${i + 1} of ${count}`, es: `Ver el paso ${i + 1} de ${count}` })}
           aria-current={i === step ? 'step' : undefined}
           onClick={() => onPick(i)}
           className={cn(

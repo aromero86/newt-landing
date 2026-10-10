@@ -4,6 +4,7 @@ import { ease, useStepper } from '@/lib/motion'
 import { ProposalBadge } from '@/components/mock/status'
 import type { ArtifactKind } from '@/lib/data'
 import { cn } from '@/lib/utils'
+import { useT, type Bi } from '@/lib/i18n'
 import { InfoCard, StepDots } from './card'
 import { CountUp } from './count-up'
 
@@ -17,6 +18,7 @@ const files = [
 ]
 
 /** What Claude finds in Acme Shop's codebase. */
+// Product vocabulary: the same word in both languages.
 const found: { kind: ArtifactKind; label: string; count: number }[] = [
   { kind: 'feature', label: 'features', count: 24 },
   { kind: 'entity', label: 'entities', count: 31 },
@@ -35,23 +37,36 @@ const kindColor: Record<ArtifactKind, string> = {
   feature: 'text-foreground',
 }
 
-const steps = [
-  'Point newt at an existing repository.',
-  'Claude reads the code: models, guards, state machines, config.',
-  'It writes one big bootstrap proposal with everything the code already does.',
-  'The team reviews it by area and accepts it. The product is defined.',
+const steps: Bi[] = [
+  { en: 'Point newt at an existing repository.', es: 'Apunta newt a un repositorio que ya existe.' },
+  {
+    en: 'Claude reads the code: models, guards, state machines, config.',
+    es: 'Claude lee el código: modelos, guards, máquinas de estados, configuración.',
+  },
+  {
+    en: 'It writes one big bootstrap proposal with everything the code already does.',
+    es: 'Escribe una gran proposal de arranque con todo lo que el código ya hace.',
+  },
+  {
+    en: 'The team reviews it by area and accepts it. The product is defined.',
+    es: 'El equipo la revisa por áreas y la acepta. El producto queda definido.',
+  },
 ]
 
 export function Bootstrap({ className }: { className?: string }) {
+  const t = useT()
   const { ref, step, setStep } = useStepper(steps.length, { interval: 2400 })
 
   return (
     <InfoCard
       stepperRef={ref}
       index={4}
-      title="Bootstrap from your codebase"
-      lead="Nobody writes the definition of an existing product by hand. newt starts from the code."
-      caption={steps[step]}
+      title={t({ en: 'Bootstrap from your codebase', es: 'Arranca desde tu código' })}
+      lead={t({
+        en: 'Nobody writes the definition of an existing product by hand. newt starts from the code.',
+        es: 'Nadie escribe a mano la definición de un producto que ya existe. newt empieza por el código.',
+      })}
+      caption={t(steps[step]!)}
       captionKey={step}
       className={className}
     >
@@ -102,7 +117,7 @@ export function Bootstrap({ className }: { className?: string }) {
         <div className={cn('rounded-xl border p-3 transition-colors duration-500', step >= 2 ? 'border-brand/40 bg-brand/5' : 'border-dashed bg-background/30')}>
           <div className="mb-2 flex flex-wrap items-center gap-1.5">
             <span className="font-mono text-[10px] text-muted-foreground">PROP-1</span>
-            <span className="text-xs font-medium">Bootstrap</span>
+            <span className="text-xs font-medium">{t({ en: 'Bootstrap', es: 'Arranque' })}</span>
             <AnimatePresence mode="wait" initial={false}>
               {step >= 2 && (
                 <motion.span key={step >= 3 ? 'm' : 'r'} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.3, ease }}>
@@ -129,7 +144,10 @@ export function Bootstrap({ className }: { className?: string }) {
                 exit={{ opacity: 0 }}
                 className="mt-2 text-[10px] text-muted-foreground"
               >
-                Its code already exists, so it goes straight to merged. 3 contradictions found in the code show up as conflicts to review.
+                {t({
+                  en: 'Its code already exists, so it goes straight to merged. 3 contradictions found in the code show up as conflicts to review.',
+                  es: 'Su código ya existe, así que pasa directamente a merged. Las 3 contradicciones encontradas en el código aparecen como conflictos a revisar.',
+                })}
               </motion.p>
             )}
           </AnimatePresence>

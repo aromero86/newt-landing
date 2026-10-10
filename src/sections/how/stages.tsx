@@ -8,7 +8,8 @@ import { Avatar } from '@/components/ui/avatar'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Typing } from '@/lib/typing'
 import { cn } from '@/lib/utils'
-import { conflict, deltas, pr, proposal, releases, rules, type Delta, type DeltaState } from '@/lib/data'
+import { useStory, type Delta, type DeltaState } from '@/lib/data'
+import { useT } from '@/lib/i18n'
 import { useSequence } from './sequence'
 
 export function Stage({ step }: { step: number }) {
@@ -17,14 +18,25 @@ export function Stage({ step }: { step: number }) {
   return <Current />
 }
 
-const proposalTabs = (counts: { deltas?: number; conflicts?: number } = {}) => [
-  { label: 'Document' },
-  { label: 'Deltas', count: counts.deltas },
-  { label: 'Checks', count: counts.conflicts },
-  { label: 'Revisions' },
-]
+/** The tabs of a proposal page. Labels come translated; `active` is matched by key. */
+function useProposalTabs() {
+  const t = useT()
+  const labels = {
+    document: t({ en: 'Document', es: 'Documento' }),
+    deltas: 'Deltas',
+    checks: t({ en: 'Checks', es: 'Comprobaciones' }),
+    revisions: 'Revisions',
+  }
+  const tabs = (counts: { deltas?: number; conflicts?: number } = {}) => [
+    { label: labels.document },
+    { label: labels.deltas, count: counts.deltas },
+    { label: labels.checks, count: counts.conflicts },
+    { label: labels.revisions },
+  ]
+  return { tabs, labels }
+}
 
-const crumbs = ['acme-shop', 'Proposals', proposal.id]
+const crumbsFor = (proposalId: string) => ['acme-shop', 'Proposals', proposalId]
 
 function Show({ when, children, className }: { when: boolean; children: ReactNode; className?: string }) {
   return (
@@ -40,6 +52,8 @@ function Show({ when, children, className }: { when: boolean; children: ReactNod
 
 /* 1 — Talk to Claude */
 function Talk() {
+  const t = useT()
+  const { proposal, rules } = useStory()
   const at = useSequence([1800, 2500, 3600, 5200, 6300])
   return (
     <ChatPanel className="h-full">
@@ -47,23 +61,34 @@ function Talk() {
         <Typing text={proposal.ask} active />
       </ChatMessage>
       <Show when={at >= 1}>
-        <ToolCall name="search">“guests pay” → <span className="text-foreground">R-12, R-07</span></ToolCall>
+        <ToolCall name="search">
+          “{t({ en: 'guests pay', es: 'invitados pagan' })}” → <span className="text-foreground">R-12, R-07</span>
+        </ToolCall>
       </Show>
       <Show when={at >= 2}>
         <ChatMessage from="claude">
-          Heads up: today <b>{rules.guestsCannotPay.id}</b> says “{rules.guestsCannotPay.text}” and <b>{rules.accountOver500.id}</b> requires an
-          account over €500. Should guests pay with Bizum only? Up to what amount? And where does their invoice go?
+          {t({ en: 'Heads up: today ', es: 'Ojo: hoy ' })}<b>{rules.guestsCannotPay.id}</b>
+          {t({ en: ' says ', es: ' dice ' })}“{rules.guestsCannotPay.text}”{t({ en: ' and ', es: ' y ' })}
+          <b>{rules.accountOver500.id}</b>
+          {t({
+            en: ' requires an account over €500. Should guests pay with Bizum only? Up to what amount? And where does their invoice go?',
+            es: ' exige cuenta por encima de 500 €. ¿Los invitados pagan solo con Bizum? ¿Hasta qué importe? ¿Y adónde va su factura?',
+          })}
         </ChatMessage>
       </Show>
       <Show when={at >= 3}>
-        <ChatMessage from={proposal.author}>Bizum only, up to €500. Invoice to the email they give us.</ChatMessage>
+        <ChatMessage from={proposal.author}>
+          {t({ en: 'Bizum only, up to €500. Invoice to the email they give us.', es: 'Solo Bizum, hasta 500 €. La factura, al email que nos den.' })}
+        </ChatMessage>
       </Show>
       <Show when={at >= 4}>
         <ToolCall name="proposals.create">→ <span className="text-foreground">{proposal.id}</span></ToolCall>
       </Show>
       <Show when={at >= 5}>
         <ChatMessage from="claude">
-          Done: <b>{proposal.id}</b> is ready for review. <span className="text-brand underline underline-offset-2">Open it in newt</span>
+          {t({ en: 'Done: ', es: 'Hecho: ' })}<b>{proposal.id}</b>
+          {t({ en: ' is ready for review. ', es: ' está lista para revisar. ' })}
+          <span className="text-brand underline underline-offset-2">{t({ en: 'Open it in newt', es: 'Ábrela en newt' })}</span>
         </ChatMessage>
       </Show>
     </ChatPanel>
@@ -72,28 +97,33 @@ function Talk() {
 
 /* 2 — The document */
 function Document() {
+  const t = useT()
+  const { proposal } = useStory()
+  const { tabs, labels } = useProposalTabs()
   const at = useSequence([500, 1100, 1700])
   return (
-    <AppWindow crumbs={crumbs} tabs={proposalTabs()} active="Document" className="h-full" bodyClassName="p-5">
+    <AppWindow crumbs={crumbsFor(proposal.id)} tabs={tabs()} active={labels.document} className="h-full" bodyClassName="p-5">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h4 className="text-lg font-semibold">{proposal.title}</h4>
           <div className="mt-1 flex items-center gap-2 text-xs text-muted-foreground">
-            <Avatar name={proposal.author} className="size-5" /> {proposal.author} with Claude · {proposal.feature}
+            <Avatar name={proposal.author} className="size-5" /> {proposal.author} {t({ en: 'with Claude', es: 'con Claude' })} · {proposal.feature}
           </div>
         </div>
         <ProposalBadge state="draft" />
       </div>
       <div className="mt-5 space-y-4 text-sm leading-relaxed">
-        <Block title="Context" visible={at >= 1}>{proposal.document[0]} {proposal.document[1]}</Block>
-        <Block title="Decision" visible={at >= 2}>
+        <Block title={t({ en: 'Context', es: 'Contexto' })} visible={at >= 1}>{proposal.document[0]} {proposal.document[1]}</Block>
+        <Block title={t({ en: 'Decision', es: 'Decisión' })} visible={at >= 2}>
           <Typing text={proposal.document[2]!} active={at >= 2} speed={18} />
         </Block>
-        <Block title="Open questions" visible={at >= 3}>None left: Claude asked about amount and invoices.</Block>
+        <Block title={t({ en: 'Open questions', es: 'Preguntas abiertas' })} visible={at >= 3}>
+          {t({ en: 'None left: Claude asked about amount and invoices.', es: 'Ninguna: Claude preguntó por el importe y las facturas.' })}
+        </Block>
       </div>
       <div className="absolute right-5 bottom-4 left-5 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
-        <span>Revision 1</span>
-        <span className="font-mono">the document is the single source</span>
+        <span>{t({ en: 'Revision 1', es: 'Revision 1' })}</span>
+        <span className="font-mono">{t({ en: 'the document is the single source', es: 'el documento es la única fuente' })}</span>
       </div>
     </AppWindow>
   )
@@ -110,10 +140,15 @@ function Block({ title, visible, children }: { title: string; visible: boolean; 
 
 /* 3 — Deltas extracted */
 function Deltas() {
+  const t = useT()
+  const { deltas, proposal } = useStory()
+  const { tabs, labels } = useProposalTabs()
   const at = useSequence([400, 800, 1200, 1600, 2000])
   return (
-    <AppWindow crumbs={crumbs} tabs={proposalTabs({ deltas: at })} active="Deltas" className="h-full" bodyClassName="p-4">
-      <p className="mb-3 text-xs text-muted-foreground">Extracted from the document · revision 1</p>
+    <AppWindow crumbs={crumbsFor(proposal.id)} tabs={tabs({ deltas: at })} active={labels.deltas} className="h-full" bodyClassName="p-4">
+      <p className="mb-3 text-xs text-muted-foreground">
+        {t({ en: 'Extracted from the document · revision 1', es: 'Extraídos del documento · revision 1' })}
+      </p>
       <ul className="flex flex-col gap-2">
         {deltas.map((d, i) => (
           <Show key={d.id} when={at > i}>
@@ -125,7 +160,15 @@ function Deltas() {
   )
 }
 
+/** How each kind of delta is named. In Spanish it agrees with "delta": nuevo, cambiado, retirado. */
+const OP_LABEL: Record<Delta['op'], { en: string; es: string }> = {
+  new: { en: 'new', es: 'nuevo' },
+  changed: { en: 'changed', es: 'cambiado' },
+  retired: { en: 'retired', es: 'retirado' },
+}
+
 function DeltaRow({ delta: d, state, note, viewed, highlight }: { delta: Delta; state: DeltaState; note?: ReactNode; viewed?: boolean; highlight?: 'bad' | 'warn' }) {
+  const t = useT()
   return (
     <li
       className={cn(
@@ -135,9 +178,11 @@ function DeltaRow({ delta: d, state, note, viewed, highlight }: { delta: Delta; 
       )}
     >
       <div className="flex items-center gap-2">
-        {viewed !== undefined && <Checkbox checked={viewed} aria-label={`Viewed ${d.id}`} className="pointer-events-none" />}
+        {viewed !== undefined && <Checkbox checked={viewed} aria-label={t({ en: `Viewed ${d.id}`, es: `${d.id} visto` })} className="pointer-events-none" />}
         <span className="font-mono text-muted-foreground">{d.id}</span>
-        <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', d.op === 'new' ? 'bg-ok/15 text-ok' : 'bg-info/15 text-info')}>{d.op}</span>
+        <span className={cn('rounded px-1.5 py-0.5 text-[10px] font-medium', d.op === 'new' ? 'bg-ok/15 text-ok' : 'bg-info/15 text-info')}>
+          {t(OP_LABEL[d.op])}
+        </span>
         <ArtifactTag kind={d.kind} id={d.artifact} />
         <span className="ml-auto">
           <DeltaBadge state={state} />
@@ -154,11 +199,14 @@ function DeltaRow({ delta: d, state, note, viewed, highlight }: { delta: Delta; 
 
 /* 4 — The gate */
 function Gate() {
+  const t = useT()
+  const { conflict, proposal } = useStory()
+  const { tabs, labels } = useProposalTabs()
   const at = useSequence([2200, 2900])
   return (
-    <AppWindow crumbs={crumbs} tabs={proposalTabs({ deltas: 5, conflicts: at >= 1 ? 1 : undefined })} active="Checks" className="h-full" bodyClassName="p-4">
+    <AppWindow crumbs={crumbsFor(proposal.id)} tabs={tabs({ deltas: 5, conflicts: at >= 1 ? 1 : undefined })} active={labels.checks} className="h-full" bodyClassName="p-4">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-muted-foreground">Checking against the planned definition</span>
+        <span className="text-muted-foreground">{t({ en: 'Checking against the planned definition', es: 'Comprobando contra la definición prevista' })}</span>
         <Counter to={1284} running={at < 1} />
       </div>
       <div className="mt-3 grid grid-cols-[repeat(32,minmax(0,1fr))] gap-[3px]" aria-hidden>
@@ -174,24 +222,26 @@ function Gate() {
         ))}
       </div>
       <div className="mt-2 flex gap-4 text-[11px] text-muted-foreground">
-        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-ok/60" /> consistent</span>
-        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-warn" /> overlapping scope, looked at closely</span>
-        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-bad" /> conflict</span>
+        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-ok/60" /> {t({ en: 'consistent', es: 'coherente' })}</span>
+        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-warn" /> {t({ en: 'overlapping scope, looked at closely', es: 'alcance solapado, revisado de cerca' })}</span>
+        <span className="flex items-center gap-1"><span className="size-2 rounded-sm bg-bad" /> {t({ en: 'conflict', es: 'conflicto' })}</span>
       </div>
       <Show when={at >= 1} className="mt-4 space-y-2">
         <div className="rounded-lg border border-bad/40 bg-bad/5 p-3 text-xs leading-relaxed">
           <div className="mb-1 flex items-center gap-2 font-medium text-bad">
-            <XCircleIcon className="size-3.5" /> Conflict · {conflict.delta} vs rule {conflict.with.id}
+            <XCircleIcon className="size-3.5" /> {t({ en: 'Conflict', es: 'Conflicto' })} · {conflict.delta} vs rule {conflict.with.id}
           </div>
           {conflict.explanation}
           <div className="mt-2 flex flex-wrap gap-2">
-            <span className="rounded-md border bg-card px-2 py-0.5">Change the proposal</span>
-            <span className="rounded-md border bg-card px-2 py-0.5 text-muted-foreground">Not a conflict (give a reason)</span>
+            <span className="rounded-md border bg-card px-2 py-0.5">{t({ en: 'Change the proposal', es: 'Cambiar la proposal' })}</span>
+            <span className="rounded-md border bg-card px-2 py-0.5 text-muted-foreground">
+              {t({ en: 'Not a conflict (give a reason)', es: 'No es conflicto (con motivo)' })}
+            </span>
           </div>
         </div>
         <Show when={at >= 2}>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
-            <span className="size-2 rounded-full bg-bad" /> Cannot be accepted: 1 open conflict
+            <span className="size-2 rounded-full bg-bad" /> {t({ en: 'Cannot be accepted: 1 open conflict', es: 'No se puede aceptar: 1 conflicto abierto' })}
           </div>
         </Show>
       </Show>
@@ -200,6 +250,7 @@ function Gate() {
 }
 
 function Counter({ to, running }: { to: number; running: boolean }) {
+  const t = useT()
   const [n, setN] = useState(running ? 0 : to)
   useEffect(() => {
     if (!running) {
@@ -209,27 +260,34 @@ function Counter({ to, running }: { to: number; running: boolean }) {
     const start = performance.now()
     let id = 0
     const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / 2000)
-      setN(Math.round(to * t))
-      if (t < 1) id = requestAnimationFrame(tick)
+      const progress = Math.min(1, (now - start) / 2000)
+      setN(Math.round(to * progress))
+      if (progress < 1) id = requestAnimationFrame(tick)
     }
     id = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(id)
   }, [running, to])
-  return <span className="font-mono text-xs tabular-nums">{n.toLocaleString('en')} artifacts</span>
+  return (
+    <span className="font-mono text-xs whitespace-nowrap tabular-nums">
+      {n.toLocaleString(t({ en: 'en', es: 'es' }))} artifacts
+    </span>
+  )
 }
 
 /* 5 — Iterate */
 function Iterate() {
+  const t = useT()
+  const { deltas, proposal, rules } = useStory()
+  const { tabs, labels } = useProposalTabs()
   const at = useSequence([900, 2200, 3400, 4300])
-  const changed = { ...deltas[0]!, after: 'Guests can pay only with Bizum, up to €500, in the mobile app.' }
+  const changed = { ...deltas[0]!, after: rules.guestsPayBizum.text }
   return (
-    <AppWindow crumbs={crumbs} tabs={proposalTabs({ deltas: 5 })} active="Deltas" className="h-full" bodyClassName="p-4">
+    <AppWindow crumbs={crumbsFor(proposal.id)} tabs={tabs({ deltas: 5 })} active={labels.deltas} className="h-full" bodyClassName="p-4">
       <div className="mb-3 flex items-center justify-between text-xs">
         <span className="font-mono">
           <span className="text-muted-foreground">revision 1 →</span> revision 2
         </span>
-        <span className="rounded-md bg-ok/10 px-2 py-0.5 font-mono text-ok">+ “up to €500”</span>
+        <span className="rounded-md bg-ok/10 px-2 py-0.5 font-mono text-ok">+ “{t({ en: 'up to €500', es: 'hasta 500 €' })}”</span>
       </div>
       <ul className="flex flex-col gap-1.5">
         <DeltaRow
@@ -237,7 +295,9 @@ function Iterate() {
           viewed={at >= 2}
           state={at >= 2 ? 'approved' : 'pending'}
           highlight={at >= 2 ? undefined : 'warn'}
-          note={at < 2 && <span className="text-warn">Changed since you approved it · conflict with R-07 resolved</span>}
+          note={at < 2 && <span className="text-warn">
+              {t({ en: 'Changed since you approved it · conflict with R-07 resolved', es: 'Ha cambiado desde que lo aprobaste · conflicto con R-07 resuelto' })}
+            </span>}
         />
         {[deltas[1]!, deltas[2]!].map(d => (
           <DeltaRow
@@ -247,7 +307,7 @@ function Iterate() {
             state="approved"
             note={
               <motion.span initial={{ opacity: 0 }} animate={{ opacity: at >= 1 ? 1 : 0 }} className="flex items-center gap-1 text-muted-foreground">
-                <EyeIcon className="size-3" /> Unchanged since you approved it
+                <EyeIcon className="size-3" /> {t({ en: 'Unchanged since you approved it', es: 'Sin cambios desde que lo aprobaste' })}
               </motion.span>
             }
           />
@@ -256,7 +316,8 @@ function Iterate() {
       </ul>
       <Show when={at >= 4} className="mt-2">
         <div className="flex items-center gap-2 rounded-lg border border-ok/40 bg-ok/8 px-3 py-2 text-xs text-ok">
-          <CheckCircle2Icon className="size-4" /> 5 of 5 deltas approved · gate passed · 0 conflicts
+          <CheckCircle2Icon className="size-4" />{' '}
+          {t({ en: '5 of 5 deltas approved · gate passed · 0 conflicts', es: '5 de 5 deltas aprobados · puerta superada · 0 conflictos' })}
         </div>
       </Show>
     </AppWindow>
@@ -265,9 +326,21 @@ function Iterate() {
 
 /* 6 — Accepted */
 function Accepted() {
+  const t = useT()
+  const { proposal } = useStory()
   const at = useSequence([900, 2000])
+  const cols = [
+    { key: 'product', label: t({ en: 'Product', es: 'Producto' }) },
+    { key: 'todo', label: t({ en: 'To do', es: 'Por hacer' }) },
+    { key: 'doing', label: t({ en: 'In progress', es: 'En curso' }) },
+  ]
+  const tabs = [
+    { label: 'Board' },
+    { label: t({ en: 'Current definition', es: 'Definición vigente' }) },
+    { label: t({ en: 'Planned definition', es: 'Definición prevista' }) },
+  ]
   return (
-    <AppWindow crumbs={['acme-shop', 'Board']} tabs={[{ label: 'Board' }, { label: 'Current definition' }, { label: 'Planned definition' }]} active="Board" className="h-full" bodyClassName="p-4">
+    <AppWindow crumbs={['acme-shop', 'Board']} tabs={tabs} active="Board" className="h-full" bodyClassName="p-4">
       <div className="mb-4 flex items-center gap-3 rounded-lg border bg-card p-3 text-sm">
         <span className="font-mono text-muted-foreground">{proposal.id}</span>
         <span className="truncate font-medium">{proposal.title}</span>
@@ -280,22 +353,26 @@ function Accepted() {
         </span>
       </div>
       <div className="grid grid-cols-3 gap-3 text-xs">
-        {['Product', 'To do', 'In progress'].map(col => (
+        {cols.map(({ key: col, label }) => (
           <div key={col} className="min-h-[200px] rounded-lg bg-subtle p-2">
-            <div className="mb-2 px-1 font-medium text-muted-foreground">{col}</div>
+            <div className="mb-2 px-1 font-medium text-muted-foreground">{label}</div>
             <div className="flex flex-col gap-2">
-              {col === 'Product' && at < 1 && <BoardCard layoutId="p42" />}
-              {col === 'To do' && at >= 1 && <BoardCard layoutId="p42" assignee={at >= 2} />}
-              {col === 'To do' && <MiniCard text="Shipping rules for Mexico" />}
-              {col === 'In progress' && <MiniCard text="Order history for guests" />}
-              {col === 'Product' && <MiniCard text="Loyalty points" />}
+              {col === 'product' && at < 1 && <BoardCard layoutId="p42" />}
+              {col === 'todo' && at >= 1 && <BoardCard layoutId="p42" assignee={at >= 2} />}
+              {col === 'todo' && <MiniCard text={t({ en: 'Shipping rules for Mexico', es: 'Reglas de envío para México' })} />}
+              {col === 'doing' && <MiniCard text={t({ en: 'Order history for guests', es: 'Historial de pedidos para invitados' })} />}
+              {col === 'product' && <MiniCard text={t({ en: 'Loyalty points', es: 'Puntos de fidelidad' })} />}
             </div>
           </div>
         ))}
       </div>
       <Show when={at >= 2} className="mt-3">
         <div className="rounded-lg border bg-card px-3 py-2 text-xs">
-          <span className="text-muted-foreground">Planned definition:</span> 1 rule changed, 1 rule added, Order lifecycle +1 state, 1 new parameter
+          <span className="text-muted-foreground">{t({ en: 'Planned definition:', es: 'Definición prevista:' })}</span>{' '}
+          {t({
+            en: '1 rule changed, 1 rule added, Order lifecycle +1 state, 1 new parameter',
+            es: '1 rule cambiada, 1 rule nueva, lifecycle Order +1 estado, 1 parameter nuevo',
+          })}
         </div>
       </Show>
     </AppWindow>
@@ -303,12 +380,14 @@ function Accepted() {
 }
 
 function BoardCard({ layoutId, assignee }: { layoutId: string; assignee?: boolean }) {
+  const t = useT()
+  const { proposal } = useStory()
   return (
     <motion.div layoutId={layoutId} transition={{ type: 'spring', stiffness: 160, damping: 22 }} className="rounded-md border border-brand/50 bg-card p-2 shadow-sm">
       <div className="font-mono text-[10px] text-muted-foreground">{proposal.id}</div>
-      <div className="mt-0.5 leading-snug">Guests pay with Bizum</div>
+      <div className="mt-0.5 leading-snug">{t({ en: 'Guests pay with Bizum', es: 'Invitados pagan con Bizum' })}</div>
       <div className="mt-1.5 flex items-center justify-between">
-        <span className="rounded bg-brand/15 px-1 text-[10px] text-brand">surface: Mobile app</span>
+        <span className="rounded bg-brand/15 px-1 text-[10px] text-brand">{t({ en: 'surface: Mobile app', es: 'superficie: App móvil' })}</span>
         {assignee && <Avatar name="Marc" className="size-4 text-[8px]" />}
       </div>
     </motion.div>
@@ -321,6 +400,8 @@ function MiniCard({ text }: { text: string }) {
 
 /* 7 — Pull request */
 function PullRequest() {
+  const t = useT()
+  const { pr, proposal } = useStory()
   const at = useSequence([700, 1700])
   const lines = [
     { n: 40, text: "export function canPay(user: User, method: Method, amount: number) {" },
@@ -331,7 +412,7 @@ function PullRequest() {
   return (
     <GitHubWindow number={pr.number} title={pr.title} state="blocked" active="Files changed" className="h-full" bodyClassName="p-4">
       <div className="flex items-center gap-2 rounded-md border bg-subtle px-3 py-2 text-xs">
-        <LinkIcon className="size-3.5 text-brand" /> Implements <b>{proposal.id}</b>
+        <LinkIcon className="size-3.5 text-brand" /> {t({ en: 'Implements', es: 'Implementa' })} <b>{proposal.id}</b>
         <ProposalBadge state="accepted" className="ml-1" />
       </div>
       <div className="mt-3 overflow-hidden rounded-md border font-mono text-[11px]">
@@ -349,7 +430,10 @@ function PullRequest() {
                   <div className="flex items-center gap-1.5 font-medium text-bad">
                     <XCircleIcon className="size-3.5" /> newt · rule R-07
                   </div>
-                  “Payments over €500 require a registered account.” This line lets Bizum skip the limit accepted in {proposal.id} (Δ1: up to €500).
+                  {t({
+                    en: `“Payments over €500 require a registered account.” This line lets Bizum skip the limit accepted in ${proposal.id} (Δ1: up to €500).`,
+                    es: `«Los pagos de más de 500 € requieren una cuenta registrada.» Esta línea deja que Bizum se salte el límite aceptado en ${proposal.id} (Δ1: hasta 500 €).`,
+                  })}
                 </div>
               </Show>
             )}
@@ -357,10 +441,12 @@ function PullRequest() {
         ))}
       </div>
       <Show when={at >= 2} className="mt-3 rounded-md border p-3">
-        <div className="mb-2 text-xs font-medium">newt / product definition — 2 pass, 1 failing, 1 warning</div>
+        <div className="mb-2 text-xs font-medium">
+          newt / product definition — {t({ en: '2 pass, 1 failing, 1 warning', es: '2 se cumplen, 1 falla, 1 aviso' })}
+        </div>
         <div className="space-y-1">
-          <CheckLine result="fail"><b>R-07</b> €500 limit · payment.ts:42</CheckLine>
-          <CheckLine result="warn"><b>Order</b> “awaiting Bizum” has no test</CheckLine>
+          <CheckLine result="fail"><b>R-07</b> {t({ en: '€500 limit', es: 'límite de 500 €' })} · payment.ts:42</CheckLine>
+          <CheckLine result="warn"><b>Order</b> {t({ en: '“awaiting Bizum” has no test', es: '«esperando Bizum» no tiene test' })}</CheckLine>
         </div>
       </Show>
     </GitHubWindow>
@@ -369,12 +455,14 @@ function PullRequest() {
 
 /* 8 — Merged */
 function Merged() {
+  const t = useT()
+  const { pr, proposal, rules } = useStory()
   const at = useSequence([800, 1800, 2700])
   return (
     <GitHubWindow number={pr.number} title={pr.title} state={at >= 1 ? 'merged' : 'open'} className="h-full" bodyClassName="p-4">
       <ul className="space-y-3 text-xs">
         <Event icon={<CheckCircle2Icon className="size-3.5 text-ok" />}>
-          <b>newt / product definition</b> — all checks passed (4 artifacts, 4 tests)
+          <b>newt / product definition</b> — {t({ en: 'all checks passed (4 artifacts, 4 tests)', es: 'todo en verde (4 artifacts, 4 tests)' })}
         </Event>
         <Show when={at >= 1}>
           <Event icon={<GitMergeIcon className="size-3.5 text-[#a371f7]" />}>
@@ -383,27 +471,28 @@ function Merged() {
         </Show>
         <Show when={at >= 2}>
           <Event icon={<span className="size-3.5 rounded-sm bg-brand" />}>
-            <b>newt</b> marked <b>{proposal.id}</b> as <ProposalBadge state="merged" className="ml-1" />
+            <b>newt</b> {t({ en: 'marked', es: 'marcó' })} <b>{proposal.id}</b> {t({ en: 'as', es: 'como' })}{' '}
+            <ProposalBadge state="merged" className="ml-1" />
           </Event>
         </Show>
       </ul>
       <Show when={at >= 3} className="mt-5 rounded-lg border bg-subtle p-3">
-        <div className="mb-2 text-xs font-medium">Current definition · acme-shop</div>
+        <div className="mb-2 text-xs font-medium">{t({ en: 'Current definition', es: 'Definición vigente' })} · acme-shop</div>
         <div className="space-y-1.5 text-xs">
           <div className="flex items-start gap-2">
             <ArtifactTag kind="rule" id="R-12" />
             <span>
-              <span className="mr-1 text-muted-foreground line-through">Guests cannot pay.</span>
-              Guests can pay only with Bizum, up to €500, in the mobile app.
+              <span className="mr-1 text-muted-foreground line-through">{rules.guestsCannotPay.text}</span>
+              {rules.guestsPayBizum.text}
             </span>
           </div>
           <div className="flex items-start gap-2">
             <ArtifactTag kind="rule" id="R-31" />
-            <span>A guest's invoice is emailed to the address used at checkout.</span>
+            <span>{rules.invoiceByEmail.text}</span>
           </div>
           <div className="flex items-start gap-2">
             <ArtifactTag kind="lifecycle" id="Order" />
-            <span>created → awaiting Bizum → paid → shipped</span>
+            <span>{t({ en: 'created → awaiting Bizum → paid → shipped', es: 'creado → esperando Bizum → pagado → enviado' })}</span>
           </div>
         </div>
       </Show>
@@ -422,6 +511,8 @@ function Event({ icon, children }: { icon: ReactNode; children: ReactNode }) {
 
 /* 9 — Release */
 function Release() {
+  const t = useT()
+  const { releases, rules } = useStory()
   const at = useSequence([700, 1500])
   const v = releases[1]!
   return (
@@ -431,7 +522,7 @@ function Release() {
           <TagIcon className="size-3.5" /> github.com/acme/shop · Releases
         </div>
         <div className="mt-2 text-lg font-semibold">{v.version}</div>
-        <div className="text-xs text-muted-foreground">Released {v.date} · 14 pull requests</div>
+        <div className="text-xs text-muted-foreground">Released {v.githubDate} · 14 pull requests</div>
         <div className="mt-3 space-y-1 font-mono text-[11px] text-muted-foreground">
           <div>#318 feat(checkout): Bizum for guests</div>
           <div>#321 fix(invoice): guest email</div>
@@ -451,18 +542,21 @@ function Release() {
           <span>newt · acme-shop · Releases</span>
           <span className="font-mono text-brand">{v.version}</span>
         </div>
-        <div className="mt-2 text-sm font-semibold">What changed in the product</div>
+        <div className="mt-2 text-sm font-semibold">{t({ en: 'What changed in the product', es: 'Qué cambió en el producto' })}</div>
         <Show when={at >= 2} className="mt-3 space-y-2 text-xs">
           <div>
-            <div className="mb-1 font-semibold text-ok">New</div>
-            <div>Guest invoices are emailed to the checkout address</div>
+            <div className="mb-1 font-semibold text-ok">{t({ en: 'New', es: 'Nuevo' })}</div>
+            <div>{rules.invoiceByEmail.text}</div>
           </div>
           <div>
-            <div className="mb-1 font-semibold text-info">Changed</div>
+            <div className="mb-1 font-semibold text-info">{t({ en: 'Changed', es: 'Cambiado' })}</div>
             <div>
-              <span className="text-muted-foreground line-through">Guests cannot pay.</span> Guests can pay with Bizum, up to €500, in the app.
+              <span className="text-muted-foreground line-through">{rules.guestsCannotPay.text}</span>{' '}
+              {t({ en: 'Guests can pay with Bizum, up to €500, in the app.', es: 'Los invitados pueden pagar con Bizum, hasta 500 €, en la app.' })}
             </div>
-            <div className="mt-1 text-muted-foreground italic">Why: guests abandon checkout when asked to sign up.</div>
+            <div className="mt-1 text-muted-foreground italic">
+              {t({ en: 'Why: guests abandon checkout when asked to sign up.', es: 'Por qué: los invitados abandonan el checkout cuando les pedimos registrarse.' })}
+            </div>
           </div>
         </Show>
       </motion.div>

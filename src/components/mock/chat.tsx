@@ -3,16 +3,18 @@ import { motion } from 'motion/react'
 import { SparklesIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Avatar } from '@/components/ui/avatar'
+import { useT } from '@/lib/i18n'
 
 /** A conversation with Claude, the way people talk to newt. */
-export function ChatPanel({ title = 'Claude · connected to newt', children, className }: { title?: string; children: ReactNode; className?: string }) {
+export function ChatPanel({ title, children, className }: { title?: string; children: ReactNode; className?: string }) {
+  const t = useT()
   return (
     <div className={cn('flex flex-col overflow-hidden rounded-xl border bg-card shadow-xl shadow-black/10', className)}>
       <div className="flex items-center gap-2 border-b bg-muted/40 px-4 py-2.5 text-xs font-medium">
         <span className="flex size-5 items-center justify-center rounded-md bg-[#d97757] text-white">
           <SparklesIcon className="size-3" />
         </span>
-        {title}
+        {title ?? t({ en: 'Claude · connected to newt', es: 'Claude · conectado a newt' })}
       </div>
       <div className="flex flex-1 flex-col gap-3 p-4 text-sm">{children}</div>
     </div>

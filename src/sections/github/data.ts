@@ -1,10 +1,10 @@
 /**
  * The GitHub side of the shared story (src/lib/data.ts): the pull requests,
  * diffs and releases the scenes show. Same people, same rules, same numbers.
+ * The shared story itself comes from useStory(); this file holds only what is
+ * this section's own. Texts come in both languages; code and ids don't.
  */
-import { bug, deltas, people, pr, proposal, releases, rules } from '@/lib/data'
-
-export { bug, deltas, people, pr, proposal, releases, rules }
+import type { Bi } from '@/lib/i18n'
 
 export type DiffLine = { n: number; kind: '+' | '-' | ' '; code: string }
 
@@ -31,31 +31,45 @@ export const fixedDiff: DiffLine[] = [
 /** A PR whose proposal is still being discussed. */
 export const blockedPr = {
   number: 321,
-  title: 'feat(checkout): returning guests can save a card',
-  proposal: { id: 'PROP-45', title: 'Returning guests can save a card' },
+  title: { en: 'feat(checkout): returning guests can save a card', es: 'feat(checkout): los invitados que repiten pueden guardar una tarjeta' } as Bi,
+  proposal: {
+    id: 'PROP-45',
+    title: { en: 'Returning guests can save a card', es: 'Los invitados que repiten pueden guardar una tarjeta' } as Bi,
+  },
 }
 
 /** A PR with no proposal that changes how the product behaves. */
 export const behaviorPr = {
   number: 324,
-  title: "fix(backoffice): support can edit a paid order's amount",
+  title: { en: "fix(backoffice): support can edit a paid order's amount", es: 'fix(backoffice): soporte puede editar el importe de un pedido pagado' } as Bi,
   declared: 'fix',
-  breaks: rules.paidOrderImmutable,
-  drafted: { id: 'PROP-47', title: 'Support can correct the amount of a paid order' },
+  /** Which rule of the story it breaks (a key of story.rules). */
+  breaks: 'paidOrderImmutable' as const,
+  drafted: {
+    id: 'PROP-47',
+    title: { en: 'Support can correct the amount of a paid order', es: 'Soporte puede corregir el importe de un pedido pagado' } as Bi,
+  },
 }
 
 /** A PR with no proposal that changes nothing a customer could notice. */
 export const technicalPr = {
   number: 325,
-  title: 'refactor(payments): extract the gateway client',
+  title: { en: 'refactor(payments): extract the gateway client', es: 'refactor(payments): extraer el cliente de la pasarela' } as Bi,
 }
 
 /** The hotfix that cannot wait for product. */
 export const hotfixPr = {
   number: 326,
-  title: 'hotfix(checkout): cancel orders stuck awaiting Bizum',
-  reason: 'Crash in production: 132 occurrences in the last hour (BUG-77).',
-  drafted: { id: 'PROP-48', title: 'Orders awaiting Bizum are cancelled after 15 minutes' },
+  title: { en: 'hotfix(checkout): cancel orders stuck awaiting Bizum', es: 'hotfix(checkout): cancelar los pedidos atascados esperando a Bizum' } as Bi,
+  reason: {
+    en: 'Crash in production: 132 occurrences in the last hour (BUG-77).',
+    es: 'Fallo grave en producción: 132 ocurrencias en la última hora (BUG-77).',
+  } as Bi,
+  drafted: {
+    id: 'PROP-48',
+    title: { en: 'Orders awaiting Bizum are cancelled after 15 minutes', es: 'Los pedidos que esperan a Bizum se cancelan a los 15 minutos' } as Bi,
+  },
 }
 
-export const release = releases.find(r => r.version === 'v2.4.0')!
+/** The release the last scene publishes. */
+export const releaseVersion = 'v2.4.0'

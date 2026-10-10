@@ -17,6 +17,7 @@ import { Avatar } from '@/components/ui/avatar'
 import { ProposalBadge } from '@/components/mock/status'
 import { GithubMark } from '@/components/site/icons'
 import type { ProposalState } from '@/lib/data'
+import { useT } from '@/lib/i18n'
 import type { DiffLine } from './data'
 
 /** Content that appears in a scene: fades and slides in, and out again. */
@@ -136,6 +137,7 @@ export type MergeState = 'blocked' | 'ready' | 'merged' | 'urgent'
 
 /** The box at the bottom of a PR: can it be merged, and why not. */
 export function MergeBox({ state, reason, pressed }: { state: MergeState; reason?: ReactNode; pressed?: boolean }) {
+  const t = useT()
   if (state === 'merged') {
     return (
       <div className="flex items-start gap-2.5 rounded-lg border border-[#8250df]/40 bg-[#8250df]/10 px-3 py-2.5 text-xs">
@@ -154,7 +156,7 @@ export function MergeBox({ state, reason, pressed }: { state: MergeState; reason
       <div className="flex items-start gap-2">
         {ready ? <CheckCircle2Icon className="mt-0.5 size-4 shrink-0 text-ok" /> : urgent ? <ZapIcon className="mt-0.5 size-4 shrink-0 text-warn" /> : <LockIcon className="mt-0.5 size-4 shrink-0 text-bad" />}
         <div className="min-w-0 flex-1">
-          <div className="font-semibold">{ready ? 'This branch has no conflicts and every check passed' : urgent ? 'Urgent lane: merge without an accepted proposal' : 'Merging is blocked'}</div>
+          <div className="font-semibold">{ready ? 'This branch has no conflicts and every check passed' : urgent ? t({ en: 'Urgent lane: merge without an accepted proposal', es: 'Carril urgente: mergear sin una proposal aceptada' }) : 'Merging is blocked'}</div>
           {reason && <div className="mt-0.5 text-muted-foreground">{reason}</div>}
         </div>
       </div>
@@ -166,7 +168,7 @@ export function MergeBox({ state, reason, pressed }: { state: MergeState; reason
           ready ? 'bg-[#1f883d] text-white' : urgent ? 'bg-warn text-background' : 'cursor-not-allowed bg-muted text-muted-foreground',
         )}
       >
-        <GitMergeIcon className="size-3.5" /> {urgent ? 'Merge without acceptance' : 'Merge pull request'}
+        <GitMergeIcon className="size-3.5" /> {urgent ? t({ en: 'Merge without acceptance', es: 'Mergear sin aceptar' }) : 'Merge pull request'}
       </motion.div>
     </div>
   )

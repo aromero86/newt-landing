@@ -7,17 +7,26 @@ import { useStepper, ease } from '@/lib/motion'
 import { cn } from '@/lib/utils'
 import { ChatMessage } from '@/components/mock/chat'
 import { CheckLine, DeltaBadge, ProposalBadge, ArtifactTag } from '@/components/mock/status'
-import { proposal, deltas, pr, rules, releases } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT, type Bi } from '@/lib/i18n'
 
-const stages = [
-  { icon: MessageSquareIcon, label: 'Talk' },
-  { icon: FileTextIcon, label: 'Propose' },
-  { icon: ShieldCheckIcon, label: 'Gate' },
-  { icon: GitPullRequestIcon, label: 'Pull request' },
-  { icon: TagIcon, label: 'Release' },
+const stages: { icon: typeof MessageSquareIcon; label: Bi }[] = [
+  { icon: MessageSquareIcon, label: { en: 'Talk', es: 'Hablar' } },
+  { icon: FileTextIcon, label: { en: 'Propose', es: 'Proponer' } },
+  { icon: ShieldCheckIcon, label: { en: 'Gate', es: 'Puerta' } },
+  { icon: GitPullRequestIcon, label: { en: 'Pull request', es: 'Pull request' } },
+  { icon: TagIcon, label: { en: 'Release', es: 'Release' } },
+]
+
+const perks: Bi[] = [
+  { en: 'Self-hosted', es: 'En tus servidores' },
+  { en: 'Claude-native (MCP)', es: 'Hecho para Claude (MCP)' },
+  { en: 'GitHub App', es: 'App de GitHub' },
+  { en: 'Bootstraps from your code', es: 'Arranca desde tu código' },
 ]
 
 export default function Hero() {
+  const t = useT()
   return (
     <section id="hero" className="relative overflow-hidden px-4 pt-16 pb-20 sm:px-6 sm:pt-24">
       <Backdrop />
@@ -34,7 +43,7 @@ export default function Hero() {
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-warn opacity-60" />
               <span className="relative inline-flex size-2 rounded-full bg-warn" />
             </span>
-            Early preview · open source · in development
+            {t({ en: 'Early preview · open source · in development', es: 'Avance · open source · en desarrollo' })}
           </motion.a>
           <motion.h1
             initial={{ opacity: 0, y: 12 }}
@@ -42,7 +51,8 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.05, ease }}
             className="mt-6 text-4xl font-semibold tracking-tight text-balance sm:text-6xl"
           >
-            Your product's definition, <span className="text-gradient">versioned like code.</span>
+            {t({ en: "Your product's definition, ", es: 'La definición de tu producto, ' })}
+            <span className="text-gradient">{t({ en: 'versioned like code.', es: 'versionada como el código.' })}</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 12 }}
@@ -50,9 +60,11 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.12, ease }}
             className="mt-6 max-w-xl text-lg text-pretty text-muted-foreground"
           >
-            newt keeps every rule, entity and permission of your product in one living definition. Changes are proposed
-            talking to Claude, approved delta by delta, refused if they contradict anything, and{' '}
-            <span className="text-foreground">checked on every pull request</span>.
+            {t({
+              en: 'newt keeps every rule, entity and permission of your product in one living definition. Changes are proposed talking to Claude, approved delta by delta, refused if they contradict anything, and ',
+              es: 'newt guarda cada rule, entity y permiso de tu producto en una única definición viva. Los cambios se proponen hablando con Claude, se aprueban delta a delta, se rechazan si contradicen algo y ',
+            })}
+            <span className="text-foreground">{t({ en: 'checked on every pull request', es: 'se comprueban en cada pull request' })}</span>.
           </motion.p>
           <motion.div
             initial={{ opacity: 0, y: 12 }}
@@ -62,12 +74,12 @@ export default function Hero() {
           >
             <Button asChild size="lg">
               <a href={REPO_URL}>
-                <GithubMark className="size-4" /> Star on GitHub
+                <GithubMark className="size-4" /> {t({ en: 'Star on GitHub', es: 'Estrella en GitHub' })}
               </a>
             </Button>
             <Button asChild size="lg" variant="outline">
               <a href={DOCS_URL}>
-                Read the quickstart <ArrowRightIcon />
+                {t({ en: 'Read the quickstart', es: 'Cómo empezar' })} <ArrowRightIcon />
               </a>
             </Button>
           </motion.div>
@@ -77,9 +89,9 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.35 }}
             className="mt-10 grid max-w-lg grid-cols-2 gap-x-6 gap-y-2 text-sm text-muted-foreground"
           >
-            {['Self-hosted', 'Claude-native (MCP)', 'GitHub App', 'Bootstraps from your code'].map(t => (
-              <li key={t} className="flex items-center gap-2">
-                <span className="size-1.5 rounded-full bg-brand" /> {t}
+            {perks.map(perk => (
+              <li key={perk.en} className="flex items-center gap-2">
+                <span className="size-1.5 rounded-full bg-brand" /> {t(perk)}
               </li>
             ))}
           </motion.ul>
@@ -102,6 +114,7 @@ function Backdrop() {
 
 /** The whole journey in one loop: talk, propose, gate, PR, release. */
 function Loop() {
+  const t = useT()
   const { ref, step } = useStepper(stages.length, { interval: 2600, hold: 1.4 })
   return (
     <motion.div
@@ -110,7 +123,10 @@ function Loop() {
       animate={{ opacity: 1, y: 0, scale: 1 }}
       transition={{ duration: 0.7, delay: 0.15, ease }}
       className="relative"
-      aria-label="Animated overview: a request becomes a proposal, passes the gate, is implemented in a pull request and ships in a release."
+      aria-label={t({
+        en: 'Animated overview: a request becomes a proposal, passes the gate, is implemented in a pull request and ships in a release.',
+        es: 'Resumen animado: una petición se convierte en una proposal, pasa la puerta, se implementa en una pull request y sale en una release.',
+      })}
       role="img"
     >
       <div className="rounded-2xl border bg-card/70 p-4 shadow-2xl shadow-black/30 backdrop-blur-xl sm:p-5">
@@ -123,7 +139,7 @@ function Loop() {
             transition={{ duration: 0.6, ease }}
           />
           {stages.map((s, i) => (
-            <li key={s.label} className="relative flex flex-col items-center gap-1.5">
+            <li key={s.label.en} className="relative flex flex-col items-center gap-1.5">
               <motion.span
                 animate={{ scale: i === step ? 1.12 : 1 }}
                 className={cn(
@@ -134,7 +150,7 @@ function Loop() {
               >
                 <s.icon className="size-4" />
               </motion.span>
-              <span className={cn('text-[10px] sm:text-[11px]', i === step ? 'text-foreground' : 'text-muted-foreground')}>{s.label}</span>
+              <span className={cn('text-[10px] sm:text-[11px]', i === step ? 'text-foreground' : 'text-muted-foreground')}>{t(s.label)}</span>
             </li>
           ))}
         </ol>
@@ -166,13 +182,17 @@ function Caption({ children }: { children: React.ReactNode }) {
 }
 
 function TalkCard() {
+  const t = useT()
+  const { proposal, rules } = useStory()
   return (
     <div className="flex flex-col gap-3 text-sm">
-      <Caption>Product talks to Claude</Caption>
+      <Caption>{t({ en: 'Product talks to Claude', es: 'Producto habla con Claude' })}</Caption>
       <ChatMessage from="Lucía">{proposal.ask}</ChatMessage>
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
         <ChatMessage from="claude">
-          Today <b>{rules.guestsCannotPay.id}</b> says “{rules.guestsCannotPay.text}” Only Bizum, or every payment method? And up to what amount?
+          {t({ en: 'Today ', es: 'Hoy ' })}<b>{rules.guestsCannotPay.id}</b>
+          {t({ en: ' says ', es: ' dice ' })}“{rules.guestsCannotPay.text}”{' '}
+          {t({ en: 'Only Bizum, or every payment method? And up to what amount?', es: '¿Solo Bizum o cualquier medio de pago? ¿Y hasta qué importe?' })}
         </ChatMessage>
       </motion.div>
     </div>
@@ -180,9 +200,11 @@ function TalkCard() {
 }
 
 function ProposeCard() {
+  const t = useT()
+  const { proposal, deltas } = useStory()
   return (
     <div>
-      <Caption>A proposal, with its deltas</Caption>
+      <Caption>{t({ en: 'A proposal, with its deltas', es: 'Una proposal, con sus deltas' })}</Caption>
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="truncate text-sm font-medium">{proposal.title}</span>
         <ProposalBadge state="in review" />
@@ -210,9 +232,11 @@ function ProposeCard() {
 }
 
 function GateCard() {
+  const t = useT()
+  const { rules } = useStory()
   return (
     <div>
-      <Caption>The gate checks the whole definition</Caption>
+      <Caption>{t({ en: 'The gate checks the whole definition', es: 'La puerta revisa toda la definición' })}</Caption>
       <div className="grid grid-cols-[repeat(24,minmax(0,1fr))] gap-1" aria-hidden>
         {Array.from({ length: 96 }, (_, i) => (
           <motion.span
@@ -230,36 +254,44 @@ function GateCard() {
         transition={{ delay: 1.2 }}
         className="mt-4 rounded-lg border border-bad/30 bg-bad/8 p-3 text-xs leading-relaxed"
       >
-        <span className="font-medium text-bad">Conflict · Δ1 vs {rules.accountOver500.id}.</span> Guests could pay over €500
-        with Bizum, but {rules.accountOver500.id} requires an account above that amount.
+        <span className="font-medium text-bad">
+          {t({ en: 'Conflict', es: 'Conflicto' })} · Δ1 vs {rules.accountOver500.id}.
+        </span>{' '}
+        {t({
+          en: `Guests could pay over €500 with Bizum, but ${rules.accountOver500.id} requires an account above that amount.`,
+          es: `Los invitados podrían pagar más de 500 € con Bizum, pero ${rules.accountOver500.id} exige cuenta por encima de ese importe.`,
+        })}
       </motion.div>
     </div>
   )
 }
 
 function PrCard() {
+  const t = useT()
+  const { pr } = useStory()
   return (
     <div>
-      <Caption>On GitHub: newt checks PR #{pr.number}</Caption>
+      <Caption>{t({ en: `On GitHub: newt checks PR #${pr.number}`, es: `En GitHub: newt revisa la PR #${pr.number}` })}</Caption>
       <div className="rounded-lg border bg-card p-3">
         <div className="mb-2 flex items-center gap-2 text-xs font-medium">
           <GithubMark className="size-3.5" /> newt / product definition
         </div>
         <div className="flex flex-col gap-1.5">
           <CheckLine result="pass">
-            <b>R-12</b> Guests pay only with Bizum — enforced
+            <b>R-12</b> {t({ en: 'Guests pay only with Bizum — enforced', es: 'Los invitados pagan solo con Bizum — se cumple' })}
           </CheckLine>
           <CheckLine result="pass">
-            <b>R-31</b> Guest invoice by email — tested
+            <b>R-31</b> {t({ en: 'Guest invoice by email — tested', es: 'Factura del invitado por email — con test' })}
           </CheckLine>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
             <CheckLine result="fail">
-              <b>R-07</b> €500 limit skipped for Bizum — <span className="font-mono">payment.ts:42</span>
+              <b>R-07</b> {t({ en: '€500 limit skipped for Bizum', es: 'El límite de 500 € no se aplica a Bizum' })} —{' '}
+              <span className="font-mono">payment.ts:42</span>
             </CheckLine>
           </motion.div>
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
             <CheckLine result="warn">
-              <b>Order</b> “awaiting Bizum” has no test
+              <b>Order</b> {t({ en: '“awaiting Bizum” has no test', es: '«esperando Bizum» no tiene test' })}
             </CheckLine>
           </motion.div>
         </div>
@@ -268,28 +300,36 @@ function PrCard() {
   )
 }
 
+const shipped: Bi[] = [
+  { en: 'Guests can pay with Bizum in the app (≤ €500)', es: 'Los invitados pueden pagar con Bizum en la app (≤ 500 €)' },
+  { en: 'Guest invoices are emailed', es: 'Las facturas de invitados se envían por email' },
+  { en: 'Order: new “awaiting Bizum” state', es: 'Order: nuevo estado «esperando Bizum»' },
+]
+
 function ReleaseCard() {
+  const t = useT()
+  const { releases } = useStory()
   const v = releases[1]!
   return (
     <div>
-      <Caption>Product and code ship together</Caption>
+      <Caption>{t({ en: 'Product and code ship together', es: 'Producto y código salen juntos' })}</Caption>
       <div className="flex items-center justify-between rounded-lg border bg-card p-3">
         <div>
           <div className="text-sm font-semibold">{v.version}</div>
-          <div className="text-xs text-muted-foreground">GitHub release = product release</div>
+          <div className="text-xs text-muted-foreground">{t({ en: 'GitHub release = product release', es: 'Release de GitHub = release de producto' })}</div>
         </div>
         <ProposalBadge state="merged" />
       </div>
       <ul className="mt-3 space-y-1.5 text-xs">
-        {['Guests can pay with Bizum in the app (≤ €500)', "Guest invoices are emailed", 'Order: new “awaiting Bizum” state'].map((t, i) => (
+        {shipped.map((line, i) => (
           <motion.li
-            key={t}
+            key={line.en}
             initial={{ opacity: 0, x: -6 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 + i * 0.15 }}
             className="flex gap-2"
           >
-            <span className="text-ok">+</span> {t}
+            <span className="text-ok">+</span> {t(line)}
           </motion.li>
         ))}
       </ul>

@@ -44,9 +44,13 @@ carpeta; solo `src/App.tsx` las compone (y ese fichero no se toca desde una secc
    - El contenido de la historia (textos de rules, títulos de proposals, mensajes
      de chat) se traduce: en castellano, Acme Shop habla castellano.
 
-6. **Una sola historia.** Usa los datos de `src/lib/data.ts` (Acme Shop, PROP-42
-   "Guests can pay with Bizum", PR #318, BUG-77, R-07/R-12/R-31…). Si necesitas más
-   datos, añádelos en tu carpeta, coherentes con esos.
+6. **Una sola historia.** Léela con `useStory()` de `@/lib/data` (Acme Shop,
+   PROP-42 "Guests can pay with Bizum", PR #318, BUG-77, R-07/R-12/R-31…): devuelve
+   los mismos datos en el idioma del visitante. No reescribas sus frases en tu
+   sección: si te falta una, añádela a la historia en los dos idiomas. Solo se
+   exportan directamente los tipos, `people` (nombres) y `dimensions` (los nombres
+   en inglés, como clave). Los deltas se nombran como `nuevo`, `cambiado`,
+   `retirado` (concuerdan con "delta"), también en los changelogs.
 7. **Responsive hasta 360 px** y accesible: texto real (no imágenes de texto),
    `aria-hidden` en lo decorativo, contraste suficiente en claro y oscuro.
 8. **Verifica antes de terminar:** `bun run build` sin errores.

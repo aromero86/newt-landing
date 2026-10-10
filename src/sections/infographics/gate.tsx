@@ -1,7 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react'
 import { CheckCircle2Icon, ScanSearchIcon, XCircleIcon } from 'lucide-react'
 import { ease, useStepper } from '@/lib/motion'
-import { conflict, deltas, proposal } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT, type Bi } from '@/lib/i18n'
 import { ProposalBadge } from '@/components/mock/status'
 import { cn } from '@/lib/utils'
 import { InfoCard, StepDots } from './card'
@@ -10,31 +11,43 @@ import { InfoCard, StepDots } from './card'
  * The definition, split in blocks by area. Each dot is an artifact. The gate
  * sweeps every block: nothing is left out. `conflictAt` marks R-07's dot.
  */
-const blocks = [
-  { name: 'Catalog', dots: 34 },
-  { name: 'Accounts', dots: 26 },
-  { name: 'Checkout › Payments', dots: 38, conflictAt: 21 },
-  { name: 'Orders', dots: 31 },
-  { name: 'Shipping', dots: 22 },
-  { name: 'Backoffice', dots: 29 },
+const blocks: { name: Bi; dots: number; conflictAt?: number }[] = [
+  { name: { en: 'Catalog', es: 'Catálogo' }, dots: 34 },
+  { name: { en: 'Accounts', es: 'Cuentas' }, dots: 26 },
+  { name: { en: 'Checkout › Payments', es: 'Checkout › Pagos' }, dots: 38, conflictAt: 21 },
+  { name: { en: 'Orders', es: 'Pedidos' }, dots: 31 },
+  { name: { en: 'Shipping', es: 'Envíos' }, dots: 22 },
+  { name: { en: 'Backoffice', es: 'Backoffice' }, dots: 29 },
 ]
 const TOTAL = blocks.reduce((n, b) => n + b.dots, 0)
 
 const SWEEP = blocks.length // steps 0..5 sweep each block
-const steps = [
-  ...blocks.map((b, i) =>
-    i < 2
-      ? `Revision 1: checking ${proposal.id}'s deltas against ${b.name}…`
-      : i === 2
-        ? `Conflict: ${conflict.explanation}`
-        : `The conflict stays open. Still checking ${b.name}: the gate reviews everything.`,
-  ),
-  'Revision 2 caps Δ1 at €500. Only the changed delta is checked again.',
-  'No conflicts detected: PROP-42 can be accepted.',
-]
+const STEPS = SWEEP + 2
 
 export function Gate({ className }: { className?: string }) {
-  const { ref, step, setStep } = useStepper(steps.length, { interval: 1700, hold: 3 })
+  const t = useT()
+  const { conflict, deltas, proposal } = useStory()
+  const steps: string[] = [
+    ...blocks.map((b, i) =>
+      i < 2
+        ? t({
+            en: `Revision 1: checking ${proposal.id}'s deltas against ${b.name.en}…`,
+            es: `Revision 1: comprobando los deltas de ${proposal.id} contra ${b.name.es}…`,
+          })
+        : i === 2
+          ? t({ en: `Conflict: ${conflict.explanation}`, es: `Conflicto: ${conflict.explanation}` })
+          : t({
+              en: `The conflict stays open. Still checking ${b.name.en}: the gate reviews everything.`,
+              es: `El conflicto sigue abierto. Sigue comprobando ${b.name.es}: la puerta lo revisa todo.`,
+            }),
+    ),
+    t({
+      en: 'Revision 2 caps Δ1 at €500. Only the changed delta is checked again.',
+      es: 'La revision 2 limita Δ1 a 500 €. Solo se vuelve a comprobar el delta que cambió.',
+    }),
+    t({ en: 'No conflicts detected: PROP-42 can be accepted.', es: 'No se detectan conflictos: PROP-42 se puede aceptar.' }),
+  ]
+  const { ref, step, setStep } = useStepper(STEPS, { interval: 1700, hold: 3 })
   const sweeping = step < SWEEP ? step : -1
   const conflictFound = step >= 2
   const fixed = step >= SWEEP
@@ -44,8 +57,11 @@ export function Gate({ className }: { className?: string }) {
     <InfoCard
       stepperRef={ref}
       index={2}
-      title="The gate checks everything"
-      lead="Before a proposal is accepted, newt checks every delta against the whole planned definition, block by block."
+      title={t({ en: 'The gate checks everything', es: 'La puerta lo revisa todo' })}
+      lead={t({
+        en: 'Before a proposal is accepted, newt checks every delta against the whole planned definition, block by block.',
+        es: 'Antes de aceptar una proposal, newt comprueba cada delta contra toda la definición prevista, bloque a bloque.',
+      })}
       caption={steps[step]}
       captionKey={step}
       className={className}
@@ -90,7 +106,7 @@ export function Gate({ className }: { className?: string }) {
           const done = sweeping === -1 || i < sweeping
           return (
             <div
-              key={block.name}
+              key={block.name.en}
               className={cn(
                 'relative overflow-hidden rounded-lg border p-2 transition-colors duration-300',
                 active ? 'border-brand/60 bg-brand/10' : 'bg-background/50',
@@ -106,7 +122,7 @@ export function Gate({ className }: { className?: string }) {
                 />
               )}
               <div className="mb-1.5 flex items-center justify-between gap-1">
-                <p className="truncate text-[11px] font-medium">{block.name}</p>
+                <p className="truncate text-[11px] font-medium">{t(block.name)}</p>
                 {done && !active && <CheckCircle2Icon className="size-3 shrink-0 text-ok/80" />}
                 {active && <ScanSearchIcon className="size-3 shrink-0 text-brand" />}
               </div>
@@ -161,7 +177,12 @@ export function Gate({ className }: { className?: string }) {
               {fixed ? <CheckCircle2Icon className="mt-0.5 size-3.5 shrink-0 text-ok" /> : <XCircleIcon className="mt-0.5 size-3.5 shrink-0 text-bad" />}
               <span>
                 <span className="font-mono">{conflict.delta}</span> × <span className="font-mono">{conflict.with.id}</span>{' '}
-                {fixed ? '— resolved in revision 2: guests pay with Bizum up to €500.' : `— ${conflict.with.text}`}
+                {fixed
+                  ? t({
+                      en: '— resolved in revision 2: guests pay with Bizum up to €500.',
+                      es: '— resuelto en la revision 2: los invitados pagan con Bizum hasta 500 €.',
+                    })
+                  : `— ${conflict.with.text}`}
               </span>
             </motion.div>
           )}

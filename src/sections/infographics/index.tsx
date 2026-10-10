@@ -6,13 +6,24 @@ import { ViewedDeltas } from './viewed-deltas'
 import { Bootstrap } from './bootstrap'
 import { Versions } from './versions'
 import { BugsVsProposals } from './bugs-vs-proposals'
+import { useT } from '@/lib/i18n'
 
 /** The key ideas of newt, one animated infographic each, in a bento grid. */
 export default function Infographics() {
+  const t = useT()
   return (
     <Section id="infographics">
-      <SectionHeading eyebrow="The ideas" title={<>Six ideas behind <span className="text-gradient">newt</span></>}>
-        Each one plays on its own while it is on screen. Tap the dots to step through.
+      <SectionHeading
+        eyebrow={t({ en: 'The ideas', es: 'Las ideas' })}
+        title={t({
+          en: <>Six ideas behind <span className="text-gradient">newt</span></>,
+          es: <>Seis ideas detrás de <span className="text-gradient">newt</span></>,
+        })}
+      >
+        {t({
+          en: 'Each one plays on its own while it is on screen. Tap the dots to step through.',
+          es: 'Cada una se reproduce sola mientras está en pantalla. Toca los puntos para ir paso a paso.',
+        })}
       </SectionHeading>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6">

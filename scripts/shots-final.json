@@ -1,0 +1,558 @@
+[
+ {
+  "name": "es-desktop-01-hero",
+  "lang": "es",
+  "selector": "#top",
+  "offset": 0,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-02-problem",
+  "lang": "es",
+  "selector": "#problem",
+  "offset": -60,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-03-how-talk",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(1)",
+  "offset": -200,
+  "times": [
+   7000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-04-how-gate",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(4)",
+  "offset": -200,
+  "times": [
+   3800
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-05-how-iterate",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(5)",
+  "offset": -200,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-06-how-pr",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(7)",
+  "offset": -200,
+  "times": [
+   2500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-07-how-release",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(9)",
+  "offset": -200,
+  "times": [
+   2500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-08-infographics",
+  "lang": "es",
+  "selector": "#infographics",
+  "offset": -60,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-09-infographics-b",
+  "lang": "es",
+  "selector": "#infographics",
+  "offset": 700,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-10-screens",
+  "lang": "es",
+  "selector": "#screens",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-11-screens-b",
+  "lang": "es",
+  "selector": "#screens",
+  "offset": 760,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-12-github",
+  "lang": "es",
+  "selector": "#github",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-13-roles",
+  "lang": "es",
+  "selector": "#roles",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-14-open-source",
+  "lang": "es",
+  "selector": "#open-source",
+  "offset": -60,
+  "times": [
+   1500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-desktop-15-cta",
+  "lang": "es",
+  "selector": "#open-source",
+  "offset": 900,
+  "times": [
+   1500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-mobile-01-hero",
+  "lang": "es",
+  "selector": "#top",
+  "offset": 0,
+  "times": [
+   3500
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-02-how",
+  "lang": "es",
+  "selector": "#how ol li:nth-child(4)",
+  "offset": 0,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-03-screens",
+  "lang": "es",
+  "selector": "#screens",
+  "offset": 0,
+  "times": [
+   3000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-04-github",
+  "lang": "es",
+  "selector": "#github",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-05-roles",
+  "lang": "es",
+  "selector": "#roles",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-06-infographics",
+  "lang": "es",
+  "selector": "#infographics",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-mobile-07-open-source",
+  "lang": "es",
+  "selector": "#open-source",
+  "offset": 700,
+  "times": [
+   1500
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-desktop-01-hero",
+  "lang": "en",
+  "selector": "#top",
+  "offset": 0,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-02-problem",
+  "lang": "en",
+  "selector": "#problem",
+  "offset": -60,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-03-how-talk",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(1)",
+  "offset": -200,
+  "times": [
+   7000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-04-how-gate",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(4)",
+  "offset": -200,
+  "times": [
+   3800
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-05-how-iterate",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(5)",
+  "offset": -200,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-06-how-pr",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(7)",
+  "offset": -200,
+  "times": [
+   2500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-07-how-release",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(9)",
+  "offset": -200,
+  "times": [
+   2500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-08-infographics",
+  "lang": "en",
+  "selector": "#infographics",
+  "offset": -60,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-09-infographics-b",
+  "lang": "en",
+  "selector": "#infographics",
+  "offset": 700,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-10-screens",
+  "lang": "en",
+  "selector": "#screens",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-11-screens-b",
+  "lang": "en",
+  "selector": "#screens",
+  "offset": 760,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-12-github",
+  "lang": "en",
+  "selector": "#github",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-13-roles",
+  "lang": "en",
+  "selector": "#roles",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-14-open-source",
+  "lang": "en",
+  "selector": "#open-source",
+  "offset": -60,
+  "times": [
+   1500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-desktop-15-cta",
+  "lang": "en",
+  "selector": "#open-source",
+  "offset": 900,
+  "times": [
+   1500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "en-mobile-01-hero",
+  "lang": "en",
+  "selector": "#top",
+  "offset": 0,
+  "times": [
+   3500
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-02-how",
+  "lang": "en",
+  "selector": "#how ol li:nth-child(4)",
+  "offset": 0,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-03-screens",
+  "lang": "en",
+  "selector": "#screens",
+  "offset": 0,
+  "times": [
+   3000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-04-github",
+  "lang": "en",
+  "selector": "#github",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-05-roles",
+  "lang": "en",
+  "selector": "#roles",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-06-infographics",
+  "lang": "en",
+  "selector": "#infographics",
+  "offset": 200,
+  "times": [
+   4000
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "en-mobile-07-open-source",
+  "lang": "en",
+  "selector": "#open-source",
+  "offset": 700,
+  "times": [
+   1500
+  ],
+  "width": 390,
+  "height": 844
+ },
+ {
+  "name": "es-light-hero",
+  "lang": "es",
+  "light": true,
+  "selector": "#top",
+  "offset": 0,
+  "times": [
+   3500
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-light-screens",
+  "lang": "es",
+  "light": true,
+  "selector": "#screens",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-light-github",
+  "lang": "es",
+  "light": true,
+  "selector": "#github",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-light-roles",
+  "lang": "es",
+  "light": true,
+  "selector": "#roles",
+  "offset": -60,
+  "times": [
+   6000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-light-infographics",
+  "lang": "es",
+  "light": true,
+  "selector": "#infographics",
+  "offset": -60,
+  "times": [
+   5000
+  ],
+  "width": 1440,
+  "height": 900
+ },
+ {
+  "name": "es-light-open-source",
+  "lang": "es",
+  "light": true,
+  "selector": "#open-source",
+  "offset": -60,
+  "times": [
+   1500
+  ],
+  "width": 1440,
+  "height": 900
+ }
+]

@@ -7,7 +7,8 @@ import { Button } from '@/components/ui/button'
 import { FakeCursor } from '@/lib/typing'
 import { useStepper } from '@/lib/motion'
 import { cn } from '@/lib/utils'
-import { deltas, proposal, conflict } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT } from '@/lib/i18n'
 
 /*
  * 0 Δ2–Δ5 pending, conflict on Δ1
@@ -16,6 +17,8 @@ import { deltas, proposal, conflict } from '@/lib/data'
  * 4 Δ1 approved  5 accepted
  */
 export function ProposalScreen() {
+  const t = useT()
+  const { deltas, proposal, conflict, rules } = useStory()
   const { ref, step } = useStepper(6, { interval: 1700, hold: 2 })
   const approved = (i: number) => (i === 0 ? step >= 4 : i === 1 ? step >= 1 : i === 2 ? step >= 2 : true)
   const cursor = [
@@ -30,7 +33,12 @@ export function ProposalScreen() {
     <div ref={ref}>
       <AppWindow
         crumbs={['acme-shop', 'Proposals', proposal.id]}
-        tabs={[{ label: 'Deltas', count: 5 }, { label: 'Document' }, { label: 'Checks', count: step >= 3 ? 0 : 1 }, { label: 'Revisions', count: step >= 3 ? 2 : 1 }]}
+        tabs={[
+          { label: 'Deltas', count: 5 },
+          { label: t({ en: 'Document', es: 'Documento' }) },
+          { label: t({ en: 'Checks', es: 'Comprobaciones' }), count: step >= 3 ? 0 : 1 },
+          { label: 'Revisions', count: step >= 3 ? 2 : 1 },
+        ]}
         active="Deltas"
         bodyClassName="grid gap-3 p-3 sm:grid-cols-[minmax(0,1fr)_150px]"
       >
@@ -38,17 +46,17 @@ export function ProposalScreen() {
         <ul className="flex min-w-0 flex-col gap-1.5">
           {deltas.map((d, i) => (
             <li key={d.id} className={cn('flex items-center gap-2 rounded-md border bg-card px-2 py-1.5 text-[11px]', i === 0 && step < 3 && 'border-bad/50 bg-bad/5')}>
-              <Checkbox checked={approved(i)} aria-label={`Viewed ${d.id}`} className="pointer-events-none" />
+              <Checkbox checked={approved(i)} aria-label={t({ en: `Viewed ${d.id}`, es: `${d.id} visto` })} className="pointer-events-none" />
               <span className="font-mono text-muted-foreground">{d.id}</span>
               <ArtifactTag kind={d.kind} id={d.artifact} className="max-sm:hidden" />
-              <span className="min-w-0 flex-1 truncate">{i === 0 && step >= 3 ? 'Guests can pay only with Bizum, up to €500.' : d.after}</span>
+              <span className="min-w-0 flex-1 truncate">{i === 0 && step >= 3 ? rules.guestsPayBizum.text : d.after}</span>
               <DeltaBadge state={approved(i) ? 'approved' : 'pending'} />
             </li>
           ))}
         </ul>
         <aside className="flex min-w-0 flex-col gap-2 text-[11px]">
           <div className="rounded-md border bg-card p-2">
-            <div className="mb-1 text-muted-foreground">State</div>
+            <div className="mb-1 text-muted-foreground">{t({ en: 'State', es: 'Estado' })}</div>
             <AnimatePresence mode="wait">
               <motion.div key={step >= 5 ? 'a' : 'r'} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
                 <ProposalBadge state={step >= 5 ? 'accepted' : 'in review'} />
@@ -61,21 +69,23 @@ export function ProposalScreen() {
                 <div className="flex items-center gap-1 font-medium text-bad">
                   <XCircleIcon className="size-3" /> {conflict.delta} vs {conflict.with.id}
                 </div>
-                <p className="mt-1 leading-snug text-muted-foreground">No limit for guests, but R-07 asks for an account over €500.</p>
+                <p className="mt-1 leading-snug text-muted-foreground">
+                  {t({ en: 'No limit for guests, but R-07 asks for an account over €500.', es: 'Sin límite para invitados, pero R-07 pide cuenta por encima de 500 €.' })}
+                </p>
               </>
             ) : (
               <div className="flex items-center gap-1 font-medium text-ok">
-                <CheckCircle2Icon className="size-3" /> No conflicts
+                <CheckCircle2Icon className="size-3" /> {t({ en: 'No conflicts', es: 'Sin conflictos' })}
               </div>
             )}
           </div>
           <div className="rounded-md border bg-card p-2">
             <div className="mb-1 text-muted-foreground">Revisions</div>
-            <Rev n={1} text="Lucía · first draft" />
-            <AnimatePresence>{step >= 3 && <Rev n={2} text="Lucía · limit to €500" fresh />}</AnimatePresence>
+            <Rev n={1} text={t({ en: 'Lucía · first draft', es: 'Lucía · primer borrador' })} />
+            <AnimatePresence>{step >= 3 && <Rev n={2} text={t({ en: 'Lucía · limit to €500', es: 'Lucía · límite de 500 €' })} fresh />}</AnimatePresence>
           </div>
           <Button size="sm" className="h-7 text-[11px]" disabled={step < 4}>
-            Accept proposal
+            {t({ en: 'Accept proposal', es: 'Aceptar proposal' })}
           </Button>
         </aside>
       </AppWindow>

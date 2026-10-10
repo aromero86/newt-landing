@@ -2,19 +2,28 @@ import type { ReactNode } from 'react'
 import { AnimatePresence, LayoutGroup, motion } from 'motion/react'
 import { GitMergeIcon, GitPullRequestIcon } from 'lucide-react'
 import { ease, useStepper } from '@/lib/motion'
-import { pr, proposal, rules } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT, type Bi } from '@/lib/i18n'
 import { ProposalBadge } from '@/components/mock/status'
 import { cn } from '@/lib/utils'
 import { InfoCard, StepDots } from './card'
 
-const steps = [
-  'PROP-42 is accepted: it joins the planned definition, waiting for its code.',
-  `PR #${pr.number} implements it and gets merged on GitHub.`,
-  'PROP-42 is merged: the current definition catches up with the plan.',
+const steps: Bi[] = [
+  {
+    en: 'PROP-42 is accepted: it joins the planned definition, waiting for its code.',
+    es: 'PROP-42 se acepta: entra en la definición prevista, a la espera de su código.',
+  },
+  { en: 'PR #318 implements it and gets merged on GitHub.', es: 'La PR #318 la implementa y se mergea en GitHub.' },
+  {
+    en: 'PROP-42 is merged: the current definition catches up with the plan.',
+    es: 'PROP-42 pasa a merged: la definición vigente alcanza a la prevista.',
+  },
 ]
 
 /** Current (merged) vs planned (+ accepted) definition, and PROP-42 moving across. */
 export function CurrentVsPlanned({ className }: { className?: string }) {
+  const t = useT()
+  const { pr, rules } = useStory()
   const { ref, step, setStep } = useStepper(steps.length, { interval: 2600 })
   const merged = step >= 2
 
@@ -22,15 +31,18 @@ export function CurrentVsPlanned({ className }: { className?: string }) {
     <InfoCard
       stepperRef={ref}
       index={1}
-      title="Current vs planned definition"
-      lead="What the product does today, and what it will do once accepted proposals ship."
-      caption={steps[step]}
+      title={t({ en: 'Current vs planned definition', es: 'Definición vigente y prevista' })}
+      lead={t({
+        en: 'What the product does today, and what it will do once accepted proposals ship.',
+        es: 'Lo que hace hoy el producto, y lo que hará cuando salgan las proposals aceptadas.',
+      })}
+      caption={t(steps[step]!)}
       captionKey={step}
       className={className}
     >
       <LayoutGroup>
         <div className="grid grid-cols-2 gap-3">
-          <Column title="Current" hint="merged · in production" tone="current">
+          <Column title={t({ en: 'Current', es: 'Vigente' })} hint={t({ en: 'merged · in production', es: 'merged · en producción' })} tone="current">
             <RuleRow id={rules.paidOrderImmutable.id} text={rules.paidOrderImmutable.text} />
             <RuleRow id={rules.freeShipping.id} text={rules.freeShipping.text} />
             <AnimatePresence mode="popLayout" initial={false}>
@@ -43,7 +55,11 @@ export function CurrentVsPlanned({ className }: { className?: string }) {
               >
                 <RuleRow
                   id={rules.guestsCannotPay.id}
-                  text={merged ? 'Guests can pay only with Bizum, in the mobile app.' : rules.guestsCannotPay.text}
+                  text={
+                    merged
+                      ? rules.guestsPayBizum.text
+                      : rules.guestsCannotPay.text
+                  }
                   changed={merged}
                 />
               </motion.div>
@@ -51,8 +67,8 @@ export function CurrentVsPlanned({ className }: { className?: string }) {
             {merged && <ProposalChip state="merged" />}
           </Column>
 
-          <Column title="Planned" hint="current + accepted" tone="planned">
-            <p className="text-[11px] text-muted-foreground">Everything in current, plus:</p>
+          <Column title={t({ en: 'Planned', es: 'Prevista' })} hint={t({ en: 'current + accepted', es: 'vigente + accepted' })} tone="planned">
+            <p className="text-[11px] text-muted-foreground">{t({ en: 'Everything in current, plus:', es: 'Todo lo vigente, y además:' })}</p>
             {!merged ? (
               <ProposalChip state="accepted" />
             ) : (
@@ -61,7 +77,7 @@ export function CurrentVsPlanned({ className }: { className?: string }) {
                 animate={{ opacity: 1 }}
                 className="rounded-lg border border-dashed px-2 py-3 text-center text-[11px] text-muted-foreground"
               >
-                Nothing pending: planned = current
+                {t({ en: 'Nothing pending: planned = current', es: 'Nada pendiente: prevista = vigente' })}
               </motion.p>
             )}
           </Column>
@@ -113,6 +129,7 @@ function RuleRow({ id, text, changed }: { id: string; text: string; changed?: bo
 }
 
 function ProposalChip({ state }: { state: 'accepted' | 'merged' }) {
+  const { proposal } = useStory()
   return (
     <motion.div
       layoutId="prop-42-chip"

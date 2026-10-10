@@ -1,7 +1,8 @@
 import { motion } from 'motion/react'
 import { GitMergeIcon, LayersIcon, TagIcon } from 'lucide-react'
 import { useStepper } from '@/lib/motion'
-import { proposal, releases } from '@/lib/data'
+import { useStory } from '@/lib/data'
+import { useT, type Bi } from '@/lib/i18n'
 import { GithubMark } from '@/components/site/icons'
 import { cn } from '@/lib/utils'
 import { InfoCard, StepDots } from './card'
@@ -10,24 +11,43 @@ import { InfoCard, StepDots } from './card'
 const between = [
   { prop: 'PROP-39', pr: 301, at: 0.3 },
   { prop: 'PROP-40', pr: 309, at: 0.5 },
-  { prop: proposal.id, pr: 318, at: 0.72 },
+  { prop: 'PROP-42', pr: 318, at: 0.72 },
 ]
 
-/** What v2.4.0 changed in the product, as developers read it. */
-const changelog = [
-  { kind: 'Changed', tone: 'text-warn', text: 'Guests can pay only with Bizum, in the mobile app, up to €500. (was: Guests cannot pay.)' },
-  { kind: 'New', tone: 'text-ok', text: "A guest's invoice is emailed to the address used at checkout." },
-  { kind: 'New', tone: 'text-ok', text: 'Order lifecycle: created → awaiting Bizum → paid → shipped.' },
-]
+/** What v2.4.0 changed in the product, as developers read it: the story's own rules. */
+function useChangelog(): { kind: Bi; tone: string; text: string }[] {
+  const t = useT()
+  const { rules, deltas } = useStory()
+  const lifecycle = deltas.find(d => d.id === 'Δ3')!
+  return [
+    {
+      kind: { en: 'Changed', es: 'Cambiado' },
+      tone: 'text-warn',
+      text: `${rules.guestsPayBizum.text} ${t({ en: '(was:', es: '(antes:' })} ${rules.guestsCannotPay.text})`,
+    },
+    { kind: { en: 'New', es: 'Nuevo' }, tone: 'text-ok', text: rules.invoiceByEmail.text },
+    { kind: { en: 'New', es: 'Nuevo' }, tone: 'text-ok', text: `${t({ en: 'Order lifecycle:', es: 'Lifecycle de Order:' })} ${lifecycle.after}` },
+  ]
+}
 
-const steps = [
-  `${releases[0].version}: the same version on both sides.`,
-  'Proposals get merged as their PRs get merged on GitHub.',
-  `${proposal.id} lands with PR #318.`,
-  `A GitHub release creates the product release: ${releases[1].version}, with its changelog.`,
+// Versions and identifiers are the same in both languages.
+const steps: Bi[] = [
+  { en: 'v2.3.0: the same version on both sides.', es: 'v2.3.0: la misma versión en los dos lados.' },
+  {
+    en: 'Proposals get merged as their PRs get merged on GitHub.',
+    es: 'Las proposals pasan a merged cuando sus PRs se mergean en GitHub.',
+  },
+  { en: 'PROP-42 lands with PR #318.', es: 'PROP-42 llega con la PR #318.' },
+  {
+    en: 'A GitHub release creates the product release: v2.4.0, with its changelog.',
+    es: 'Un release de GitHub crea la release de producto: v2.4.0, con su changelog.',
+  },
 ]
 
 export function Versions({ className }: { className?: string }) {
+  const t = useT()
+  const { releases } = useStory()
+  const changelog = useChangelog()
   const { ref, step, setStep } = useStepper(steps.length, { interval: 2300 })
   const progress = [0.12, 0.55, 0.78, 1][step]!
   const shown = between.filter(b => b.at <= progress)
@@ -36,21 +56,24 @@ export function Versions({ className }: { className?: string }) {
     <InfoCard
       stepperRef={ref}
       index={5}
-      title="Product and code share one version"
-      lead="A proposal is merged when its code is. A release is the same moment in newt and on GitHub."
-      caption={steps[step]}
+      title={t({ en: 'Product and code share one version', es: 'Producto y código comparten versión' })}
+      lead={t({
+        en: 'A proposal is merged when its code is. A release is the same moment in newt and on GitHub.',
+        es: 'Una proposal pasa a merged cuando su código se mergea. Una release es el mismo momento en newt y en GitHub.',
+      })}
+      caption={t(steps[step]!)}
       captionKey={step}
       className={className}
     >
       <div className="relative rounded-xl border bg-background/50 px-3 py-4">
         {/* Lane labels */}
         <div className="mb-2 flex items-center gap-1.5 text-[11px] font-medium">
-          <LayersIcon className="size-3.5 text-brand" /> Product · newt
+          <LayersIcon className="size-3.5 text-brand" /> {t({ en: 'Product · newt', es: 'Producto · newt' })}
         </div>
         <Lane progress={progress} items={shown.map(b => ({ key: b.prop, at: b.at, label: b.prop, tone: 'product' as const }))} releaseShown={step >= 3} />
 
         <div className="mt-5 mb-2 flex items-center gap-1.5 text-[11px] font-medium">
-          <GithubMark className="size-3.5" /> Code · GitHub
+          <GithubMark className="size-3.5" /> {t({ en: 'Code · GitHub', es: 'Código · GitHub' })}
         </div>
         <Lane progress={progress} items={shown.map(b => ({ key: `pr-${b.pr}`, at: b.at, label: `#${b.pr}`, tone: 'code' as const }))} releaseShown={step >= 3} />
 
@@ -71,8 +94,8 @@ export function Versions({ className }: { className?: string }) {
         </p>
         <ul className="space-y-1 text-[11px]">
           {changelog.map(c => (
-            <li key={c.text} className="flex gap-2">
-              <span className={cn('w-16 shrink-0 font-mono', c.tone)}>{c.kind}</span>
+            <li key={c.kind.en + c.text} className="flex gap-2">
+              <span className={cn('w-16 shrink-0 font-mono', c.tone)}>{t(c.kind)}</span>
               <span className="text-foreground/85">{c.text}</span>
             </li>
           ))}

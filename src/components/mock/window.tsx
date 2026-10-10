@@ -58,7 +58,8 @@ export function AppWindow({
           ))}
         </div>
         {tabs && (
-          <div className="mt-3 flex gap-1 overflow-x-auto text-xs">
+          // Tabs wrap to a second line on narrow screens instead of being cut off.
+          <div className="mt-3 flex flex-wrap gap-x-1 text-xs">
             {tabs.map(t => (
               <span
                 key={t.label}

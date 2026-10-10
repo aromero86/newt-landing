@@ -13,6 +13,18 @@ export type Bi<T = string> = { en: T; es: T }
 
 const STORAGE_KEY = 'newt-lang'
 
+/** The page's title and description in each language. */
+const META: Record<Lang, { title: string; description: string }> = {
+  en: {
+    title: 'newt — the living definition of your product',
+    description: "newt keeps your product's rules, entities and permissions in one living definition: versioned like code, never contradictory, and checked on every pull request.",
+  },
+  es: {
+    title: 'newt — la definición viva de tu producto',
+    description: 'newt guarda las rules, entities y permisos de tu producto en una única definición viva: versionada como el código, sin contradicciones y comprobada en cada pull request.',
+  },
+}
+
 function initialLang(): Lang {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -40,6 +52,8 @@ export function LangProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     document.documentElement.lang = lang
+    document.title = META[lang].title
+    document.querySelector('meta[name="description"]')?.setAttribute('content', META[lang].description)
   }, [lang])
 
   const value = useMemo(() => ({ lang, setLang }), [lang, setLang])
