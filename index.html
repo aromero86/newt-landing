@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>newt — the living definition of your product</title>
+    <meta name="description" content="newt keeps your product's rules, entities and permissions in one living definition: versioned like code, never contradictory, and checked on every pull request." />
+    <link rel="icon" type="image/svg+xml" href="/newt.svg" />
+    <script>
+      try {
+        var t = localStorage.getItem('newt-theme');
+        if (t === 'light') document.documentElement.classList.remove('dark');
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
