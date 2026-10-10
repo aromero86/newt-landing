@@ -20,10 +20,30 @@ carpeta; solo `src/App.tsx` las compone (y ese fichero no se toca desde una secc
    un texto que explica cada paso. Tienen que respetar `prefers-reduced-motion`
    (`useStepper` y `MotionConfig` ya lo hacen: con movimiento reducido se ve el
    último paso, quieto).
-5. **Copy en inglés.** Vocabulario del producto en inglés, siempre igual:
-   workspace, dimension, feature, artifact, rule, entity, lifecycle, actor,
-   parameter, proposal, delta, revision, bug, release, board; *current definition*
-   (lo merged) y *planned definition* (más lo accepted).
+5. **Copy en inglés y castellano.** La landing está en los dos idiomas y toma el
+   del navegador (el visitante puede cambiarlo con el selector EN/ES). Cada texto
+   se escribe junto al componente que lo muestra, en los dos idiomas:
+   ```tsx
+   import { useT, type Bi } from '@/lib/i18n'
+   const t = useT()
+   <h2>{t({ en: 'A clear headline', es: 'Un titular claro' })}</h2>
+   ```
+   Para datos fuera de un componente, guárdalos como `Bi` (`{ en, es }`) y
+   resuélvelos con `t(...)` al pintarlos. Sin textos sueltos en un solo idioma.
+   - **Castellano natural**, no traducción literal; tuteo; frases cortas.
+   - **El vocabulario del producto no se traduce**: workspace, dimension, feature,
+     artifact, rule, entity, lifecycle, actor, parameter, proposal, delta,
+     revision, bug, release, board, y los estados (`draft`, `accepted`,
+     `merged`…). En castellano: "la proposal", "los deltas", "la definición
+     vigente" (*current definition*) y "la prevista" (*planned definition*).
+   - **Identificadores, código y nombres propios no cambian**: PROP-42, R-07,
+     PR #318, BUG-77, v2.4.0, nombres de ficheros y de personas, diffs.
+   - **La interfaz propia de GitHub se queda en inglés** (Files changed, Merge pull
+     request, Open/Merged…), como es en la realidad; sí se traduce lo que escriben
+     las personas y newt (títulos, comentarios, informes del check).
+   - El contenido de la historia (textos de rules, títulos de proposals, mensajes
+     de chat) se traduce: en castellano, Acme Shop habla castellano.
+
 6. **Una sola historia.** Usa los datos de `src/lib/data.ts` (Acme Shop, PROP-42
    "Guests can pay with Bizum", PR #318, BUG-77, R-07/R-12/R-31…). Si necesitas más
    datos, añádelos en tu carpeta, coherentes con esos.

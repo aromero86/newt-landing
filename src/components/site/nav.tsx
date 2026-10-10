@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button'
 import { REPO_URL } from '@/lib/links'
 import { Logo } from './logo'
 import { ThemeToggle } from './theme-toggle'
+import { LangToggle } from './lang-toggle'
 import { GithubMark } from './icons'
 
 const links = [
@@ -26,6 +27,7 @@ export function Nav() {
           ))}
         </nav>
         <div className="flex items-center gap-1">
+          <LangToggle />
           <ThemeToggle />
           <Button asChild size="sm" variant="outline">
             <a href={REPO_URL}>
