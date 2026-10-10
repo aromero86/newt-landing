@@ -63,7 +63,7 @@ const kindLook: Record<ArtifactKind, string> = {
 /** An artifact reference: its kind and id, e.g. `rule R-12`. */
 export function ArtifactTag({ kind, id, className }: { kind: ArtifactKind; id?: string; className?: string }) {
   return (
-    <span className={cn('inline-flex items-center gap-1 rounded-md border bg-background/60 px-1.5 py-0.5 font-mono text-[10px]', className)}>
+    <span className={cn('inline-flex shrink-0 items-center gap-1 rounded-md border bg-background/60 px-1.5 py-0.5 font-mono text-[10px] whitespace-nowrap', className)}>
       <span className={kindLook[kind]}>{kind}</span>
       {id && <span className="text-muted-foreground">{id}</span>}
     </span>

@@ -28,9 +28,10 @@ export function SectionHeading({ eyebrow, title, children, center }: { eyebrow: 
 }
 
 /** Fades content in the first time it scrolls into view. */
-export function Reveal({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
+export function Reveal({ children, className, delay = 0, id }: { children: ReactNode; className?: string; delay?: number; id?: string }) {
   return (
     <motion.div
+      id={id}
       initial={{ opacity: 0, y: 16 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.25 }}

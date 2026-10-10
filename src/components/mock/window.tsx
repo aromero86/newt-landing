@@ -7,7 +7,7 @@ import { GithubMark } from '@/components/site/icons'
 /** Browser chrome: traffic lights and an address bar. */
 function Chrome({ url, children, className }: { url: string; children: ReactNode; className?: string }) {
   return (
-    <div className={cn('overflow-hidden rounded-xl border bg-card shadow-2xl shadow-black/20 ring-1 ring-black/5', className)}>
+    <div className={cn('min-w-0 overflow-hidden rounded-xl border bg-card shadow-2xl shadow-black/20 ring-1 ring-black/5', className)}>
       <div className="flex items-center gap-3 border-b bg-muted/50 px-3 py-2">
         <div className="flex gap-1.5" aria-hidden>
           <span className="size-2.5 rounded-full bg-[#ff5f57]" />
